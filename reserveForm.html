@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservation Form</title>
+    <link rel="stylesheet" href="stylesRf.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Reserve a Table</h1>
+        <form action="submitReservation.php" method="post">
+            <div class="form-group">
+                <label for="fullName">Full Name:</label>
+                <input type="text" id="fullName" name="fullName" required>
+            </div>
+            <div class="form-group">
+                <label for="birthdate">Birthdate:</label>
+                <input type="date" id="birthdate" name="birthdate" required>
+            </div>
+            <div class="form-group">
+                <label for="reservationDate">Reservation Date:</label>
+                <input type="date" id="reservationDate" name="reservationDate" required>
+            </div>
+            <div class="form-group">
+                <label for="reservationTime">Reservation Time:</label>
+                <input type="time" id="reservationTime" name="reservationTime" required>
+            </div>
+            <div class="form-group">
+                <label for="seating">Seating Preference:</label>
+                <select id="seating" name="seating" required>
+                    <option value="outdoor">Outdoor</option>
+                    <option value="indoor">Indoor</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="specialRequests">Special Requests:</label>
+                <textarea id="specialRequests" name="specialRequests"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" required>
+            </div>
+            <input type="hidden" name="restaurantId" id="restaurantId">
+            <button type="submit">Submit Reservation</button>
+        </form>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const restaurantId = urlParams.get('restaurantId');
+        document.getElementById('restaurantId').value = restaurantId;
+    </script>
+</body>
+</html>

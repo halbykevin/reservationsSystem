@@ -1,0 +1,2 @@
+I want the top buttons to be when on pgae to be active in maybe different color mode
+or more opacity

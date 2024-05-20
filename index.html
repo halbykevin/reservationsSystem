@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="stylesheet" href="stylesIndex.css" />
+  </head>
+  <body>
+    <div class="button-container">
+      <button onclick="location.href='index.html'">Home</button>
+      <button onclick="location.href='discover.php'">Discover</button>
+      <button onclick="location.href='liked.php'">Liked</button>
+      <button onclick="location.href='logout.php'">Logout</button>
+    </div>
+    <div class="main-container">
+      <h1 id="welcome-message">Welcome to the Restaurant Reservation System</h1>
+    </div>
+
+    <script>
+      function logout() {
+        // Placeholder for actual logout functionality
+        location.href = "login.html";
+      }
+
+      // Hide the welcome message after 3 seconds
+      setTimeout(() => {
+        const welcomeMessage = document.getElementById("welcome-message");
+        if (welcomeMessage) {
+          welcomeMessage.style.display = "none";
+        }
+      }, 3000);
+    </script>
+  </body>
+</html>
