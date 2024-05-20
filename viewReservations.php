@@ -61,7 +61,7 @@ if ($result->num_rows > 0) {
 </head>
 <body>
     <div class="button-container">
-        <button onclick="location.href='index.html'">Home</button>
+        <button onclick="location.href='indexR.html'">Home</button>
         <button onclick="location.href='myRestaurants.php'">My Restaurants</button>
         <button onclick="location.href='viewReservations.php'">Reservations</button>
         <button onclick="logout()">Logout</button>
