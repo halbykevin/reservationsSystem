@@ -1,2 +1,3 @@
-I want the top buttons to be when on pgae to be active in maybe different color mode
+I want the top buttons to be when on any page to be active in maybe different color mode
 or more opacity
+I want a button like social profile when clicked the user can edit his account like profile photo, emai, phone number...
