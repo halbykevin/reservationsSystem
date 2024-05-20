@@ -22,10 +22,46 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>View Reservations</title>
     <link rel="stylesheet" href="stylesIndexR.css">
+    <style>
+        .reservation-box {
+            background-color: #ffffff;
+            border: 1px solid #dddddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 300px;
+        }
+        .reservation-box p {
+            margin: 5px 0;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .button-container button:hover {
+            background-color: #0056b3;
+        }
+    </style>
 </head>
 <body>
     <div class="button-container">
-        <button onclick="location.href='indexR.html'">Home</button>
+        <button onclick="location.href='index.html'">Home</button>
         <button onclick="location.href='myRestaurants.php'">My Restaurants</button>
         <button onclick="location.href='viewReservations.php'">Reservations</button>
         <button onclick="logout()">Logout</button>
@@ -41,6 +77,7 @@ if ($result->num_rows > 0) {
             <p><strong>Seating:</strong> <?php echo $reservation['seating']; ?></p>
             <p><strong>Special Requests:</strong> <?php echo $reservation['special_requests']; ?></p>
             <p><strong>Phone:</strong> <?php echo $reservation['phone']; ?></p>
+            <p><strong>Number of People:</strong> <?php echo $reservation['num_people']; ?></p>
             <p><strong>Status:</strong> <?php echo $reservation['status']; ?></p>
         </div>
         <?php endforeach; ?>
