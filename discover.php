@@ -40,8 +40,8 @@ if ($result->num_rows > 0) {
 <body>
     <div class="button-container">
         <button onclick="location.href='index.html'">Home</button>
-        <button onclick="location.href='discover.html'">Discover</button>
-        <button onclick="location.href='liked.html'">Liked</button>
+        <button onclick="location.href='discover.php'">Discover</button>
+        <button onclick="location.href='liked.php'">Liked</button>
         <button onclick="logout()">Logout</button>
     </div>
     <div class="search-container">
