@@ -28,9 +28,11 @@ while ($row = $result->fetch_assoc()) {
     <link rel="stylesheet" href="stylesIndexR.css">
 </head>
 <body>
-    <div class="button-container">
-        <button onclick="location.href='logout.php'">Logout</button>
+<div class="button-container">
         <button onclick="location.href='indexR.html'">Home</button>
+        <button onclick="location.href='viewReservations.php'">Reservations</button>
+        <button onclick="location.href='reservationsHistory.php'">Reservations History</button>
+        <button onclick="logout()">Logout</button>
     </div>
     <div class="container">
         <h1>My Restaurants</h1>
