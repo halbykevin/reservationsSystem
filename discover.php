@@ -26,6 +26,75 @@ if ($result->num_rows > 0) {
     <title>Discover Restaurants</title>
     <link rel="stylesheet" href="stylesDiscover.css">
     <style>
+        .profile-icon {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+        }
+        .profile-modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+        .profile-modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+        }
+        .close-profile-modal {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close-profile-modal:hover,
+        .close-profile-modal:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+        .form-group button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .form-group button:hover {
+            background-color: #0056b3;
+        }
         .search-container {
             width: 100%;
             display: flex;
@@ -83,12 +152,21 @@ if ($result->num_rows > 0) {
     </style>
 </head>
 <body>
-    <div class="button-container">
+<div class="button-container">
         <button onclick="location.href='index.html'">Home</button>
         <button onclick="location.href='discover.php'">Discover</button>
         <button onclick="location.href='liked.php'">Liked</button>
+        <button onclick="location.href='myPoints.php'">My Points</button>
         <button onclick="logout()">Logout</button>
     </div>
+
+    <img
+        src="images/icons/user-avatar.png"
+        class="profile-icon"
+        alt="Profile Icon"
+        onclick="openProfileModal()"
+    />
+
     <div class="search-container">
         <input type="text" id="searchBar" onkeyup="filterRestaurants()" placeholder="Search for restaurants...">
     </div>
@@ -102,6 +180,52 @@ if ($result->num_rows > 0) {
                 </div>
             </div>
         </div>
+
+        <div id="profileModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <span class="close-profile-modal" onclick="closeProfileModal()">&times;</span>
+            <h2>Edit Profile</h2>
+            <form action="updateProfile.php" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="profilePicture">Profile Picture:</label>
+                    <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="oldPassword">Old Password:</label>
+                    <input type="password" id="oldPassword" name="oldPassword" required>
+                </div>
+                <button type="submit">Update Profile</button>
+            </form>
+            <br>
+            <button onclick="openResetPassword()">Reset Password</button>
+        </div>
+    </div>
+
+    <div id="resetPasswordModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <span class="close-profile-modal" onclick="closeResetPasswordModal()">&times;</span>
+            <h2>Reset Password</h2>
+            <form action="resetPassword.php" method="post">
+                <div class="form-group">
+                    <label for="resetOldPassword">Old Password:</label>
+                    <input type="password" id="resetOldPassword" name="oldPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="resetNewPassword">New Password:</label>
+                    <input type="password" id="resetNewPassword" name="newPassword" required>
+                </div>
+                <button type="submit">Reset Password</button>
+            </form>
+        </div>
+    </div>
 
         <!-- Modal Structure -->
         <div id="restaurant<?php echo $restaurant['id']; ?>" class="modal">
@@ -225,6 +349,27 @@ if ($result->num_rows > 0) {
                     alert('Error rating restaurant.');
                 }
             });
+        }
+
+        function openProfileModal() {
+            document.getElementById("profileModal").style.display = "block";
+        }
+
+        function closeProfileModal() {
+            document.getElementById("profileModal").style.display = "none";
+        }
+
+        function openResetPassword() {
+            document.getElementById("profileModal").style.display = "none";
+            document.getElementById("resetPasswordModal").style.display = "block";
+        }
+
+        function closeResetPasswordModal() {
+            document.getElementById("resetPasswordModal").style.display = "none";
+        }
+
+        function logout() {
+            location.href = "logout.php";
         }
     </script>
 </body>
