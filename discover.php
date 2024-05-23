@@ -1,8 +1,16 @@
 <?php
 require 'db.php';
 
-$sql = "SELECT * FROM restaurants";
+$sql = "SELECT restaurants.*, IFNULL(AVG(ratings.rating), 0) AS avg_rating, COUNT(ratings.id) AS num_ratings
+        FROM restaurants
+        LEFT JOIN ratings ON restaurants.id = ratings.restaurant_id
+        GROUP BY restaurants.id";
 $result = $conn->query($sql);
+
+if (!$result) {
+    die("Database query failed: " . $conn->error);
+}
+
 $restaurants = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
@@ -34,6 +42,43 @@ if ($result->num_rows > 0) {
             color: red;
             cursor: pointer;
             user-select: none;
+        }
+        .stars {
+            display: flex;
+            gap: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            justify-content: center;
+        }
+        .star {
+            font-size: 24px;
+            color: gold;
+        }
+        .star.empty {
+            color: lightgray;
+        }
+        .rating-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .submit-rating {
+            display: none;
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .submit-rating:hover {
+            background-color: #0056b3;
+        }
+        .num-ratings {
+            font-size: 14px;
+            color: gray;
         }
     </style>
 </head>
@@ -79,12 +124,23 @@ if ($result->num_rows > 0) {
                 <p><a href="<?php echo htmlspecialchars($restaurant['location']); ?>" target="_blank">View on Google Maps</a></p>
                 <button onclick="location.href='reserveForm.html?restaurantId=<?php echo $restaurant['id']; ?>'">Reserve Now</button>
                 <span class="heart-button" onclick="likeRestaurant(<?php echo $restaurant['id']; ?>)">❤</span>
+                <div class="rating-container">
+                    <div class="stars" data-restaurant-id="<?php echo $restaurant['id']; ?>">
+                        <?php for ($i = 1; $i <= 5; $i++): ?>
+                            <span class="star <?php echo $i <= round($restaurant['avg_rating']) ? '' : 'empty'; ?>" onclick="rateRestaurant(<?php echo $restaurant['id']; ?>, <?php echo $i; ?>)">★</span>
+                        <?php endfor; ?>
+                    </div>
+                    <div class="num-ratings">(<?php echo $restaurant['num_ratings']; ?>)</div>
+                    <button class="submit-rating" id="submit-rating-<?php echo $restaurant['id']; ?>" onclick="submitRating(<?php echo $restaurant['id']; ?>)">Submit Rating</button>
+                </div>
             </div>
         </div>
         <?php endforeach; ?>
     </div>
 
     <script>
+        let currentRating = {};
+
         function openModal(id) {
             document.getElementById(id).style.display = "block";
         }
@@ -134,6 +190,39 @@ if ($result->num_rows > 0) {
                     alert('Restaurant liked!');
                 } else {
                     alert('Error liking restaurant.');
+                }
+            });
+        }
+
+        function rateRestaurant(restaurantId, rating) {
+            currentRating[restaurantId] = rating;
+            const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('empty');
+                } else {
+                    star.classList.add('empty');
+                }
+            });
+            document.getElementById(`submit-rating-${restaurantId}`).style.display = "block";
+        }
+
+        function submitRating(restaurantId) {
+            const rating = currentRating[restaurantId];
+            fetch('rateRestaurant.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ restaurantId: restaurantId, rating: rating })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Thank you for your rating!');
+                    location.reload(); // Reload the page to update the average rating
+                } else {
+                    alert('Error rating restaurant.');
                 }
             });
         }
