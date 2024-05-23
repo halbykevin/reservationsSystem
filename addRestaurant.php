@@ -1,9 +1,5 @@
 <?php
 session_start();
-if (!isset($_SESSION['user_id']) || $_SESSION['account_type'] !== 'restaurant') {
-    header("Location: login.php");
-    exit();
-}
 
 require 'db.php';
 
@@ -20,6 +16,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
     if (!empty($logo)) {
         $target_dir = "uploads/";
+        
+        // Check if the directory exists
+        if (!is_dir($target_dir)) {
+            mkdir($target_dir, 0755, true); // Create the directory if it doesn't exist
+        }
+
         $target_file = $target_dir . basename($logo);
         if (!move_uploaded_file($_FILES['logo']['tmp_name'], $target_file)) {
             echo "Error uploading file.";
