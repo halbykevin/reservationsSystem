@@ -1,6 +1,3 @@
 I want the top buttons to be when on any page to be active in maybe different color mode
 or more opacity
-I want a button like social profile when clicked the user can edit his account like profile photo, emai, phone number...
-I need how many people coming for the reservations 
-Status pending or accepted via email maybe or idk
 I want an automation for the reservation status via sms or email or whatsapp
