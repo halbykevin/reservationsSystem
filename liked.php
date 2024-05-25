@@ -158,6 +158,7 @@ if ($result->num_rows > 0) {
         top: 10px;
         left: 10px;
         z-index: 1;
+        display: none;
       }
       @media screen and (max-width: 768px) {
         .button-container {
