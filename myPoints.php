@@ -97,10 +97,11 @@ display: none; /* Hide the open button initially */
       }
     </style>
     <div class="button-container">
-        <button onclick="location.href='index.html'">Home</button>
-        <button onclick="location.href='discover.php'">Discover</button>
-        <button onclick="location.href='liked.php'">Liked</button>
-        <button onclick="logout()">Logout</button>
+      <button onclick="location.href='index.html'">Home</button>
+      <button onclick="location.href='discover.php'">Discover</button>
+      <button onclick="location.href='liked.php'">Liked</button>
+      <button onclick="location.href='myPoints.php'">My Points</button>
+      <button onclick="logout()">Logout</button>
     </div>
 
     <button class="openbtn" onclick="openNav()">☰</button>
