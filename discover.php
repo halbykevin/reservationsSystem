@@ -26,6 +26,33 @@ if ($result->num_rows > 0) {
     <title>Discover Restaurants</title>
     <link rel="stylesheet" href="stylesDiscover.css">
     <style>
+        /* Add this to your existing CSS */
+
+.container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  padding: 20px;
+}
+
+.restaurant-box {
+  position: relative;
+  margin: 15px;
+  width: 200px;
+  height: 200px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+    .restaurant-box {
+        width: calc(50% - 30px); /* Adjust width to fit two per row */
+        height: 150px; /* Adjust height to fit smaller size */
+    }
+}
+
         .button-container {
         display: flex;
         justify-content: center; /* Center buttons horizontally */
