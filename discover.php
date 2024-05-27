@@ -27,106 +27,113 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="stylesDiscover.css">
     <style>
         /* Add this to your existing CSS */
-
-.container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  padding: 20px;
-}
-
-.restaurant-box {
-  position: relative;
-  margin: 15px;
-  width: 200px;
-  height: 200px;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-}
-
-@media screen and (max-width: 768px) {
-    .restaurant-box {
-        width: calc(50% - 30px); /* Adjust width to fit two per row */
-        height: 150px; /* Adjust height to fit smaller size */
-    }
-}
-
-        .button-container {
-        display: flex;
-        justify-content: center; /* Center buttons horizontally */
-        gap: 10px; /* Space between buttons */
-        background-color: #fff;
-        padding: 10px 0;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        width: 100%;
-      }
-      .main-container {
-        flex: 1;
-        width: 100%;
-        max-width: 1200px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        background-color: #fff;
-        padding: 20px;
-        margin: 20px auto;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-      .sidebar {
-        height: 100%;
-        width: 250px;
-        position: fixed;
-        top: 0;
-        left: -250px;
-        background-color: #111;
-        overflow-x: hidden;
-        transition: 0.5s;
-        padding-top: 60px;
-        z-index: 1;
-      }
-      .sidebar a {
-        padding: 10px 15px;
-        text-decoration: none;
-        font-size: 18px;
-        color: white;
-        display: block;
-        transition: 0.3s;
-      }
-      .sidebar a:hover {
-        background-color: #575757;
-      }
-      .sidebar .closebtn {
-        position: absolute;
-        top: 10px;
-        right: 25px;
-        font-size: 36px;
-      }
-      .openbtn {
-        background-color: transparent;
-        font-size: 20px;
-        cursor: pointer;
-        color: black;
-        padding: 10px 15px;
-        border: none;
-        position: fixed;
-        top: 10px;
-        left: 10px;
-        z-index: 1;
-        display: none; /* Hide the open button initially */
-      }
-      @media screen and (max-width: 768px) {
-        .button-container {
-          display: none; /* Hide button container on small screens */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 20px;
         }
+
+        .restaurant-box {
+            position: relative;
+            margin: 15px;
+            width: 200px;
+            height: 200px;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        @media screen and (max-width: 768px) {
+            .restaurant-box {
+                width: calc(50% - 30px); /* Adjust width to fit two per row */
+                height: 150px; /* Adjust height to fit smaller size */
+            }
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center; /* Center buttons horizontally */
+            gap: 10px; /* Space between buttons */
+            background-color: #fff;
+            padding: 10px 0;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+        }
+
+        .main-container {
+            flex: 1;
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            background-color: #fff;
+            padding: 20px;
+            margin: 20px auto;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar {
+            height: 100%;
+            width: 250px;
+            position: fixed;
+            top: 0;
+            left: -250px;
+            background-color: #111;
+            overflow-x: hidden;
+            transition: 0.5s;
+            padding-top: 60px;
+            z-index: 1;
+        }
+
+        .sidebar a {
+            padding: 10px 15px;
+            text-decoration: none;
+            font-size: 18px;
+            color: white;
+            display: block;
+            transition: 0.3s;
+        }
+
+        .sidebar a:hover {
+            background-color: #575757;
+        }
+
+        .sidebar .closebtn {
+            position: absolute;
+            top: 10px;
+            right: 25px;
+            font-size: 36px;
+        }
+
         .openbtn {
-          display: block; /* Show the open button on small screens */
+            background-color: transparent;
+            font-size: 20px;
+            cursor: pointer;
+            color: black;
+            padding: 10px 15px;
+            border: none;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1;
+            display: none; /* Hide the open button initially */
         }
-      }
+
+        @media screen and (max-width: 768px) {
+            .button-container {
+                display: none; /* Hide button container on small screens */
+            }
+            .openbtn {
+                display: block; /* Show the open button on small screens */
+            }
+        }
+
         .profile-icon {
             position: fixed;
             top: 10px;
@@ -135,6 +142,7 @@ if ($result->num_rows > 0) {
             width: 40px;
             height: 40px;
         }
+
         .profile-modal {
             display: none;
             position: fixed;
@@ -147,6 +155,7 @@ if ($result->num_rows > 0) {
             background-color: rgba(0, 0, 0, 0.4);
             padding-top: 60px;
         }
+
         .profile-modal-content {
             background-color: #fefefe;
             margin: 5% auto;
@@ -156,6 +165,7 @@ if ($result->num_rows > 0) {
             max-width: 600px;
             border-radius: 10px;
         }
+
         .close-profile-modal {
             color: #aaa;
             float: right;
@@ -163,19 +173,23 @@ if ($result->num_rows > 0) {
             font-weight: bold;
             cursor: pointer;
         }
+
         .close-profile-modal:hover,
         .close-profile-modal:focus {
             color: black;
             text-decoration: none;
             cursor: pointer;
         }
+
         .form-group {
             margin-bottom: 15px;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 5px;
         }
+
         .form-group input,
         .form-group select,
         .form-group textarea {
@@ -185,6 +199,7 @@ if ($result->num_rows > 0) {
             border-radius: 4px;
             border: 1px solid #ccc;
         }
+
         .form-group button {
             padding: 10px 20px;
             background-color: #007bff;
@@ -193,26 +208,31 @@ if ($result->num_rows > 0) {
             border-radius: 5px;
             cursor: pointer;
         }
+
         .form-group button:hover {
             background-color: #0056b3;
         }
+
         .search-container {
             width: 100%;
             display: flex;
             justify-content: center;
             margin-top: 20px;
         }
+
         .search-container input {
             width: 50%;
             padding: 10px;
             font-size: 16px;
         }
+
         .heart-button {
             font-size: 24px;
             color: red;
             cursor: pointer;
             user-select: none;
         }
+
         .stars {
             display: flex;
             gap: 5px;
@@ -220,19 +240,23 @@ if ($result->num_rows > 0) {
             margin-top: 10px;
             justify-content: center;
         }
+
         .star {
             font-size: 24px;
             color: gold;
         }
+
         .star.empty {
             color: lightgray;
         }
+
         .rating-container {
             display: flex;
             flex-direction: column;
             align-items: center;
             margin-top: 10px;
         }
+
         .submit-rating {
             display: none;
             margin-top: 10px;
@@ -243,17 +267,44 @@ if ($result->num_rows > 0) {
             border-radius: 4px;
             cursor: pointer;
         }
+
         .submit-rating:hover {
             background-color: #0056b3;
         }
+
         .num-ratings {
             font-size: 14px;
             color: gray;
         }
+
+        .features {
+            margin-top: 10px;
+        }
+
+        .feature-bubble {
+            display: inline-block;
+            background-color: #f1f1f1;
+            border-radius: 15px;
+            padding: 5px 10px;
+            margin: 2px;
+            font-size: 14px;
+        }
+
+        .open-hours {
+            margin-top: 10px;
+        }
+
+        .open-hours h3 {
+            margin-bottom: 5px;
+        }
+
+        .open-hours p {
+            margin: 0;
+        }
     </style>
 </head>
 <body>
-<div class="button-container">
+    <div class="button-container">
         <button onclick="location.href='index.html'">Home</button>
         <button onclick="location.href='discover.php'">Discover</button>
         <button onclick="location.href='liked.php'">Liked</button>
@@ -271,12 +322,12 @@ if ($result->num_rows > 0) {
     <button class="openbtn" onclick="openNav()">☰</button>
 
     <div id="mySidebar" class="sidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-      <a href="index.html">Home</a>
-      <a href="discover.php">Discover</a>
-      <a href="liked.php">Liked</a>
-      <a href="myPoints.php">My Points</a>
-      <a href="javascript:logout()">Logout</a>
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+        <a href="index.html">Home</a>
+        <a href="discover.php">Discover</a>
+        <a href="liked.php">Liked</a>
+        <a href="myPoints.php">My Points</a>
+        <a href="javascript:logout()">Logout</a>
     </div>
 
     <div class="search-container">
@@ -292,53 +343,6 @@ if ($result->num_rows > 0) {
                 </div>
             </div>
         </div>
-
-        <div id="profileModal" class="profile-modal">
-        <div class="profile-modal-content">
-            <span class="close-profile-modal" onclick="closeProfileModal()">&times;</span>
-            <h2>Edit Profile</h2>
-            <form action="updateProfile.php" method="post" enctype="multipart/form-data">
-                <div class="form-group">
-                    <label for="profilePicture">Profile Picture:</label>
-                    <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
-                </div>
-                <div class="form-group">
-                    <label for="email">Email:</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                <div class="form-group">
-                    <label for="phone">Phone Number:</label>
-                    <input type="tel" id="phone" name="phone" required>
-                </div>
-                <div class="form-group">
-                    <label for="oldPassword">Old Password:</label>
-                    <input type="password" id="oldPassword" name="oldPassword" required>
-                </div>
-                <button type="submit">Update Profile</button>
-            </form>
-            <br>
-            <button onclick="openResetPassword()">Reset Password</button>
-        </div>
-    </div>
-
-    <div id="resetPasswordModal" class="profile-modal">
-        <div class="profile-modal-content">
-            <span class="close-profile-modal" onclick="closeResetPasswordModal()">&times;</span>
-            <h2>Reset Password</h2>
-            <form action="resetPassword.php" method="post">
-                <div class="form-group">
-                    <label for="resetOldPassword">Old Password:</label>
-                    <input type="password" id="resetOldPassword" name="oldPassword" required>
-                </div>
-                <div class="form-group">
-                    <label for="resetNewPassword">New Password:</label>
-                    <input type="password" id="resetNewPassword" name="newPassword" required>
-                </div>
-                <button type="submit">Reset Password</button>
-            </form>
-        </div>
-    </div>
-
         <!-- Modal Structure -->
         <div id="restaurant<?php echo $restaurant['id']; ?>" class="modal">
             <div class="modal-content">
@@ -349,6 +353,28 @@ if ($result->num_rows > 0) {
                     </div>
                 </div>
                 <p class="bio"><?php echo $restaurant['bio']; ?></p>
+                
+                <!-- Display features -->
+                <div class="features">
+                    <?php 
+                    $features = explode(',', $restaurant['features']); 
+                    foreach ($features as $feature) {
+                        echo "<span class='feature-bubble'>" . htmlspecialchars(trim($feature)) . "</span>";
+                    }
+                    ?>
+                </div>
+                
+                <!-- Display open hours -->
+                <div class="open-hours">
+                    <h3>Open Hours</h3>
+                    <?php 
+                    $open_hours = explode("\n", $restaurant['open_hours']);
+                    foreach ($open_hours as $hours) {
+                        echo "<p>" . htmlspecialchars(trim($hours)) . "</p>";
+                    }
+                    ?>
+                </div>
+                
                 <iframe
                     src="<?php echo htmlspecialchars($restaurant['location']); ?>"
                     width="100%"
@@ -480,16 +506,13 @@ if ($result->num_rows > 0) {
             document.getElementById("resetPasswordModal").style.display = "none";
         }
 
-        function logout() {
-            location.href = "logout.php";
-        }
         function openNav() {
-        document.getElementById("mySidebar").style.left = "0";
-      }
+            document.getElementById("mySidebar").style.left = "0";
+        }
 
-      function closeNav() {
-        document.getElementById("mySidebar").style.left = "-250px";
-      }
+        function closeNav() {
+            document.getElementById("mySidebar").style.left = "-250px";
+        }
     </script>
 </body>
 </html>

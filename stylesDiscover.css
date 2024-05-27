@@ -172,3 +172,25 @@ button:hover {
 .bio {
   margin: 20px 0;
 }
+.feature-bubble {
+  display: inline-block;
+  background-color: #f1f1f1;
+  color: #333;
+  padding: 5px 10px;
+  margin: 5px;
+  border-radius: 20px;
+  font-size: 14px;
+}
+
+.open-hours {
+  margin-top: 10px;
+}
+
+.open-hours h3 {
+  margin-bottom: 5px;
+}
+
+.open-hours p {
+  margin: 2px 0;
+  font-size: 14px;
+}

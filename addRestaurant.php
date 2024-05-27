@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 require 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -9,6 +8,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $address = $_POST['address'];
     $phone = $_POST['phone'];
     $location = $_POST['location'];
+    $features = $_POST['features']; // Add this line to capture features
+    $open_hours = $_POST['open_hours']; // Add this line to capture open hours
     $userId = $_SESSION['user_id'];
     
     $logo = $_FILES['logo']['name'];
@@ -28,19 +29,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             exit();
         }
     }
-    
-    if ($target_file) {
-        $sql = "INSERT INTO restaurants (name, bio, address, phone, location, logo, user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("ssssssi", $name, $bio, $address, $phone, $location, $target_file, $userId);
-    } else {
-        $sql = "INSERT INTO restaurants (name, bio, address, phone, location, user_id) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sssssi", $name, $bio, $address, $phone, $location, $userId);
-    }
-    
+
+    // Insert restaurant data into the database
+    $sql = "INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("issssssss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $logo);
+
     if ($stmt->execute()) {
-        header("Location: indexR.html?success=1");
+        header("Location: indexR.html");
     } else {
         echo "Error: " . $stmt->error;
     }
