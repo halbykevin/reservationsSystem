@@ -118,8 +118,8 @@ if ($result->num_rows > 0) {
             
             <iframe
                 src="<?php echo htmlspecialchars($restaurant['location']); ?>"
-                width="100%"
-                height="150"
+                width="50%"
+                height="600"
                 style="border:0;"
                 allowfullscreen=""
                 loading="lazy">
