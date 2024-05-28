@@ -14,10 +14,22 @@ if (!$result) {
 $restaurants = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
+        $restaurantId = $row['id'];
+        $imageSql = "SELECT image_path FROM restaurant_images WHERE restaurant_id = ?";
+        $imageStmt = $conn->prepare($imageSql);
+        $imageStmt->bind_param("i", $restaurantId);
+        $imageStmt->execute();
+        $imageResult = $imageStmt->get_result();
+        $images = [];
+        while ($imageRow = $imageResult->fetch_assoc()) {
+            $images[] = $imageRow['image_path'];
+        }
+        $row['images'] = $images;
         $restaurants[] = $row;
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -301,6 +313,43 @@ if ($result->num_rows > 0) {
         .open-hours p {
             margin: 0;
         }
+        
+        
+    .main-image-frame {
+        margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 600px; /* Fixed height for the main image frame */
+    margin-bottom: 15px; /* Space between main image and thumbnails */
+}
+
+.main-image {
+    max-width: 100%;
+    max-height: 100%;
+}
+
+.thumbnail-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+}
+
+.thumbnail {
+    width: 60px;
+    height: 60px;
+    margin: 0 5px;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.thumbnail:hover,
+.thumbnail.active {
+    border: 2px solid #007bff;
+}
+
+
+
     </style>
 </head>
 <body>
@@ -333,72 +382,78 @@ if ($result->num_rows > 0) {
     <div class="search-container">
         <input type="text" id="searchBar" onkeyup="filterRestaurants()" placeholder="Search for restaurants...">
     </div>
+
     <div class="container" id="restaurantContainer">
-        <?php foreach ($restaurants as $restaurant): ?>
-        <div class="restaurant-box" data-name="<?php echo strtolower($restaurant['name']); ?>" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
-            <div class="image-container">
-                <img src="<?php echo $restaurant['logo']; ?>" alt="<?php echo $restaurant['name']; ?>">
-                <div class="overlay">
-                    <span class="restaurant-name"><?php echo $restaurant['name']; ?></span>
-                </div>
+    <?php foreach ($restaurants as $restaurant): ?>
+    <div class="restaurant-box" data-name="<?php echo strtolower($restaurant['name']); ?>" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
+        <div class="image-container">
+            <img src="<?php echo $restaurant['logo']; ?>" alt="<?php echo $restaurant['name']; ?>">
+            <div class="overlay">
+                <span class="restaurant-name"><?php echo $restaurant['name']; ?></span>
             </div>
         </div>
-        <!-- Modal Structure -->
-        <div id="restaurant<?php echo $restaurant['id']; ?>" class="modal">
-            <div class="modal-content">
-                <span class="close" onclick="closeModal('restaurant<?php echo $restaurant['id']; ?>')">X</span>
-                <div class="slideshow-container">
-                    <div class="slide fade">
-                        <img src="<?php echo $restaurant['logo']; ?>" class="main-image" alt="<?php echo $restaurant['name']; ?>">
-                    </div>
-                </div>
-                <p class="bio"><?php echo $restaurant['bio']; ?></p>
-                
-                <!-- Display features -->
-                <div class="features">
-                    <?php 
-                    $features = explode(',', $restaurant['features']); 
-                    foreach ($features as $feature) {
-                        echo "<span class='feature-bubble'>" . htmlspecialchars(trim($feature)) . "</span>";
-                    }
-                    ?>
-                </div>
-                
-                <!-- Display open hours -->
-                <div class="open-hours">
-                    <h3>Open Hours</h3>
-                    <?php 
-                    $open_hours = explode("\n", $restaurant['open_hours']);
-                    foreach ($open_hours as $hours) {
-                        echo "<p>" . htmlspecialchars(trim($hours)) . "</p>";
-                    }
-                    ?>
-                </div>
-                
-                <iframe
-                    src="<?php echo htmlspecialchars($restaurant['location']); ?>"
-                    width="100%"
-                    height="150"
-                    style="border:0;"
-                    allowfullscreen=""
-                    loading="lazy">
-                </iframe>
-                <p><a href="<?php echo htmlspecialchars($restaurant['location']); ?>" target="_blank">View on Google Maps</a></p>
-                <button onclick="location.href='reserveForm.html?restaurantId=<?php echo $restaurant['id']; ?>'">Reserve Now</button>
-                <span class="heart-button" onclick="likeRestaurant(<?php echo $restaurant['id']; ?>)">❤</span>
-                <div class="rating-container">
-                    <div class="stars" data-restaurant-id="<?php echo $restaurant['id']; ?>">
-                        <?php for ($i = 1; $i <= 5; $i++): ?>
-                            <span class="star <?php echo $i <= round($restaurant['avg_rating']) ? '' : 'empty'; ?>" onclick="rateRestaurant(<?php echo $restaurant['id']; ?>, <?php echo $i; ?>)">★</span>
-                        <?php endfor; ?>
-                    </div>
-                    <div class="num-ratings">(<?php echo $restaurant['num_ratings']; ?>)</div>
-                    <button class="submit-rating" id="submit-rating-<?php echo $restaurant['id']; ?>" onclick="submitRating(<?php echo $restaurant['id']; ?>)">Submit Rating</button>
-                </div>
-            </div>
-        </div>
-        <?php endforeach; ?>
     </div>
+    
+    <!-- Modal Structure -->
+<div id="restaurant<?php echo $restaurant['id']; ?>" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal('restaurant<?php echo $restaurant['id']; ?>')">X</span>
+        <div class="main-image-frame">
+            <img src="<?php echo $restaurant['images'][0]; ?>" class="main-image" id="mainImage<?php echo $restaurant['id']; ?>" alt="<?php echo $restaurant['name']; ?>">
+        </div>
+        <div class="thumbnail-container">
+            <?php foreach ($restaurant['images'] as $index => $imagePath): ?>
+            <img src="<?php echo $imagePath; ?>" class="thumbnail" alt="<?php echo $restaurant['name']; ?>" onclick="currentSlide(<?php echo $index; ?>, '<?php echo $restaurant['id']; ?>')">
+            <?php endforeach; ?>
+        </div>
+        <p class="bio"><?php echo $restaurant['bio']; ?></p>
+            
+            <!-- Display features -->
+            <div class="features">
+                <?php 
+                $features = explode(',', $restaurant['features']); 
+                foreach ($features as $feature) {
+                    echo "<span class='feature-bubble'>" . htmlspecialchars(trim($feature)) . "</span>";
+                }
+                ?>
+            </div>
+            
+            <!-- Display open hours -->
+            <div class="open-hours">
+                <h3>Open Hours</h3>
+                <?php 
+                $open_hours = explode("\n", $restaurant['open_hours']);
+                foreach ($open_hours as $hours) {
+                    echo "<p>" . htmlspecialchars(trim($hours)) . "</p>";
+                }
+                ?>
+            </div>
+            
+            <iframe
+                src="<?php echo htmlspecialchars($restaurant['location']); ?>"
+                width="100%"
+                height="150"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy">
+            </iframe>
+            <p><a href="<?php echo htmlspecialchars($restaurant['location']); ?>" target="_blank">View on Google Maps</a></p>
+            <button onclick="location.href='reserveForm.html?restaurantId=<?php echo $restaurant['id']; ?>'">Reserve Now</button>
+            <span class="heart-button" onclick="likeRestaurant(<?php echo $restaurant['id']; ?>)">❤</span>
+            <div class="rating-container">
+                <div class="stars" data-restaurant-id="<?php echo $restaurant['id']; ?>">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                        <span class="star <?php echo $i <= round($restaurant['avg_rating']) ? '' : 'empty'; ?>" onclick="rateRestaurant(<?php echo $restaurant['id']; ?>, <?php echo $i; ?>)">★</span>
+                    <?php endfor; ?>
+                </div>
+                <div class="num-ratings">(<?php echo $restaurant['num_ratings']; ?>)</div>
+                <button class="submit-rating" id="submit-rating-<?php echo $restaurant['id']; ?>" onclick="submitRating(<?php echo $restaurant['id']; ?>)">Submit Rating</button>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
+
 
     <script>
         let currentRating = {};
@@ -513,6 +568,48 @@ if ($result->num_rows > 0) {
         function closeNav() {
             document.getElementById("mySidebar").style.left = "-250px";
         }
+        
+        
+        let slideTimers = {}; // Store timers for each restaurant
+let slideIndices = {}; // Store slide indices for each restaurant
+
+function showSlides(restaurantId) {
+    const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+    thumbnails.forEach((thumbnail, index) => {
+        thumbnail.classList.remove('active');
+    });
+    slideIndices[restaurantId]++;
+    if (slideIndices[restaurantId] > thumbnails.length) {
+        slideIndices[restaurantId] = 1;
+    }
+    thumbnails[slideIndices[restaurantId] - 1].classList.add('active');
+    document.getElementById(`mainImage${restaurantId}`).src = thumbnails[slideIndices[restaurantId] - 1].src;
+    slideTimers[restaurantId] = setTimeout(() => showSlides(restaurantId), 2000); // Change image every 2 seconds
+}
+
+function currentSlide(index, restaurantId) {
+    clearTimeout(slideTimers[restaurantId]); // Stop the automatic slideshow
+    const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+    thumbnails.forEach((thumbnail, idx) => {
+        thumbnail.classList.remove('active');
+    });
+    thumbnails[index].classList.add('active');
+    document.getElementById(`mainImage${restaurantId}`).src = thumbnails[index].src;
+    slideIndices[restaurantId] = index + 1; // Update slide index
+}
+
+function openModal(id) {
+    const restaurantId = id.replace('restaurant', '');
+    document.getElementById(id).style.display = "block";
+    slideIndices[restaurantId] = 0;
+    showSlides(restaurantId);
+}
+
+function closeModal(id) {
+    const restaurantId = id.replace('restaurant', '');
+    document.getElementById(id).style.display = "none";
+    clearTimeout(slideTimers[restaurantId]); // Stop the slideshow when the modal is closed
+}
     </script>
 </body>
 </html>
