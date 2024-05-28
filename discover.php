@@ -420,7 +420,7 @@ if ($result->num_rows > 0) {
             
             <!-- Display open hours -->
             <div class="open-hours">
-                <h3>Open Hours</h3>
+            <h3>Open Hours</h3>
                 <?php 
                 $open_hours = explode("\n", $restaurant['open_hours']);
                 foreach ($open_hours as $hours) {
