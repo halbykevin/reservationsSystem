@@ -18,3 +18,13 @@ Stack trace:
 #0 C:\xampp\htdocs\reservations\updateReservationStatus.php(73): mysqli->prepare('INSERT INTO res...')
 #1 {main}
   thrown in C:\xampp\htdocs\reservations\updateReservationStatus.php on line 73
+[27-May-2024 14:14:44 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'restaurant_reservations.reservations_history' doesn't exist in C:\xampp\htdocs\reservations\updateReservationStatus.php:73
+Stack trace:
+#0 C:\xampp\htdocs\reservations\updateReservationStatus.php(73): mysqli->prepare('INSERT INTO res...')
+#1 {main}
+  thrown in C:\xampp\htdocs\reservations\updateReservationStatus.php on line 73
+[27-May-2024 19:14:03 Europe/Berlin] PHP Fatal error:  Uncaught mysqli_sql_exception: Table 'restaurant_reservations.reservations_history' doesn't exist in C:\xampp\htdocs\reservations\updateReservationStatus.php:73
+Stack trace:
+#0 C:\xampp\htdocs\reservations\updateReservationStatus.php(73): mysqli->prepare('INSERT INTO res...')
+#1 {main}
+  thrown in C:\xampp\htdocs\reservations\updateReservationStatus.php on line 73
