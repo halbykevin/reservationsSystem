@@ -1,11 +1,36 @@
 <?php
 require 'db.php';
 
+// Fetch unique addresses for the dropdown
+$addressSql = "SELECT DISTINCT address FROM restaurants";
+$addressResult = $conn->query($addressSql);
+$addresses = [];
+if ($addressResult->num_rows > 0) {
+    while($row = $addressResult->fetch_assoc()) {
+        $addresses[] = $row['address'];
+    }
+}
+
+$selectedLocation = isset($_GET['location']) ? $_GET['location'] : 'All';
+
 $sql = "SELECT restaurants.*, IFNULL(AVG(ratings.rating), 0) AS avg_rating, COUNT(ratings.id) AS num_ratings
         FROM restaurants
-        LEFT JOIN ratings ON restaurants.id = ratings.restaurant_id
-        GROUP BY restaurants.id";
-$result = $conn->query($sql);
+        LEFT JOIN ratings ON restaurants.id = ratings.restaurant_id";
+
+if ($selectedLocation !== 'All') {
+    $sql .= " WHERE restaurants.address = ?";
+}
+
+$sql .= " GROUP BY restaurants.id";
+
+$stmt = $conn->prepare($sql);
+
+if ($selectedLocation !== 'All') {
+    $stmt->bind_param("s", $selectedLocation);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
 
 if (!$result) {
     die("Database query failed: " . $conn->error);
@@ -29,6 +54,7 @@ if ($result->num_rows > 0) {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -68,8 +94,15 @@ if ($result->num_rows > 0) {
     </div>
 
     <div class="search-container">
-        <input type="text" id="searchBar" onkeyup="filterRestaurants()" placeholder="Search for restaurants...">
-    </div>
+    <input type="text" id="searchBar" onkeyup="filterRestaurants()" placeholder="Search for restaurants...">
+    <select id="locationDropdown" onchange="filterByLocation()">
+        <option value="All" <?php if ($selectedLocation == 'All') echo 'selected'; ?>>All</option>
+        <?php foreach ($addresses as $address): ?>
+            <option value="<?php echo htmlspecialchars($address); ?>" <?php if ($selectedLocation == $address) echo 'selected'; ?>><?php echo htmlspecialchars($address); ?></option>
+        <?php endforeach; ?>
+    </select>
+</div>
+
 
     <div class="container" id="restaurantContainer">
     <?php foreach ($restaurants as $restaurant): ?>
@@ -141,9 +174,8 @@ if ($result->num_rows > 0) {
             <?php endforeach; ?>
         </div>
         <div class="bio-frame">
-  <p class="bio"><?php echo $restaurant['bio']; ?></p>
-</div>
-
+            <p class="bio"><?php echo $restaurant['bio']; ?></p>
+        </div>
             
             <!-- Display features -->
             <div class="features">
@@ -190,7 +222,6 @@ if ($result->num_rows > 0) {
     </div>
     <?php endforeach; ?>
 </div>
-
 
     <script>
         let currentRating = {};
@@ -305,48 +336,14 @@ if ($result->num_rows > 0) {
         function closeNav() {
             document.getElementById("mySidebar").style.left = "-250px";
         }
-        
-        
-        let slideTimers = {}; // Store timers for each restaurant
-let slideIndices = {}; // Store slide indices for each restaurant
 
-function showSlides(restaurantId) {
-    const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
-    thumbnails.forEach((thumbnail, index) => {
-        thumbnail.classList.remove('active');
-    });
-    slideIndices[restaurantId]++;
-    if (slideIndices[restaurantId] > thumbnails.length) {
-        slideIndices[restaurantId] = 1;
-    }
-    thumbnails[slideIndices[restaurantId] - 1].classList.add('active');
-    document.getElementById(`mainImage${restaurantId}`).src = thumbnails[slideIndices[restaurantId] - 1].src;
-    slideTimers[restaurantId] = setTimeout(() => showSlides(restaurantId), 2000); // Change image every 2 seconds
+        function filterByLocation() {
+    const selectedLocation = document.getElementById('locationDropdown').value;
+    const url = new URL(window.location.href);
+    url.searchParams.set('location', selectedLocation);
+    window.location.href = url.href;
 }
 
-function currentSlide(index, restaurantId) {
-    clearTimeout(slideTimers[restaurantId]); // Stop the automatic slideshow
-    const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
-    thumbnails.forEach((thumbnail, idx) => {
-        thumbnail.classList.remove('active');
-    });
-    thumbnails[index].classList.add('active');
-    document.getElementById(`mainImage${restaurantId}`).src = thumbnails[index].src;
-    slideIndices[restaurantId] = index + 1; // Update slide index
-}
-
-function openModal(id) {
-    const restaurantId = id.replace('restaurant', '');
-    document.getElementById(id).style.display = "block";
-    slideIndices[restaurantId] = 0;
-    showSlides(restaurantId);
-}
-
-function closeModal(id) {
-    const restaurantId = id.replace('restaurant', '');
-    document.getElementById(id).style.display = "none";
-    clearTimeout(slideTimers[restaurantId]); // Stop the slideshow when the modal is closed
-}
     </script>
 </body>
 </html>
