@@ -38,6 +38,7 @@ if ($result->num_rows > 0) {
     <title>Discover Restaurants</title>
     <link rel="stylesheet" href="stylesDiscover.css">
     <link rel="stylesheet" href="stylesDiscover2.css">
+    <link rel="stylesheet" href="stylesDiscover3.css">
 </head>
 <body>
     <div class="button-container">
@@ -80,6 +81,52 @@ if ($result->num_rows > 0) {
             </div>
         </div>
     </div>
+
+    <div id="profileModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <span class="close-profile-modal" onclick="closeProfileModal()">&times;</span>
+            <h2>Edit Profile</h2>
+            <form action="updateProfile.php" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="profilePicture">Profile Picture:</label>
+                    <input type="file" id="profilePicture" name="profilePicture" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" required>
+                </div>
+                <div class="form-group">
+                    <label for="oldPassword">Old Password:</label>
+                    <input type="password" id="oldPassword" name="oldPassword" required>
+                </div>
+                <button type="submit">Update Profile</button>
+            </form>
+            <br>
+            <button onclick="openResetPassword()">Reset Password</button>
+        </div>
+    </div>
+
+    <div id="resetPasswordModal" class="profile-modal">
+        <div class="profile-modal-content">
+            <span class="close-profile-modal" onclick="closeResetPasswordModal()">&times;</span>
+            <h2>Reset Password</h2>
+            <form action="resetPassword.php" method="post">
+                <div class="form-group">
+                    <label for="resetOldPassword">Old Password:</label>
+                    <input type="password" id="resetOldPassword" name="oldPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="resetNewPassword">New Password:</label>
+                    <input type="password" id="resetNewPassword" name="newPassword" required>
+                </div>
+                <button type="submit">Reset Password</button>
+            </form>
+        </div>
+    </div>
     
     <!-- Modal Structure -->
 <div id="restaurant<?php echo $restaurant['id']; ?>" class="modal">
@@ -93,7 +140,10 @@ if ($result->num_rows > 0) {
             <img src="<?php echo $imagePath; ?>" class="thumbnail" alt="<?php echo $restaurant['name']; ?>" onclick="currentSlide(<?php echo $index; ?>, '<?php echo $restaurant['id']; ?>')">
             <?php endforeach; ?>
         </div>
-        <p class="bio"><?php echo $restaurant['bio']; ?></p>
+        <div class="bio-frame">
+  <p class="bio"><?php echo $restaurant['bio']; ?></p>
+</div>
+
             
             <!-- Display features -->
             <div class="features">

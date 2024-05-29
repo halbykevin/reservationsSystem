@@ -125,8 +125,18 @@ button:hover {
   border: 2px solid #007bff;
 }
 
+.bio-frame {
+  max-width: 80%; /* Adjust the width as needed */
+  margin: 20px auto; /* Center the frame and add vertical margin */
+  padding: 10px; /* Add padding for better readability */
+  background-color: rgba(255, 255, 255, 0.8); /* Transparent white background */
+  border-radius: 8px; /* Rounded corners */
+  text-align: center; /* Left-align the text */
+}
+
 .bio {
-  margin: 20px 0;
+  margin: 0; /* Remove default margin */
+  font-size: 16px; /* Adjust the font size as needed */
 }
 .feature-bubble {
   display: inline-block;
@@ -150,4 +160,3 @@ button:hover {
   margin: 2px 0;
   font-size: 14px;
 }
-
