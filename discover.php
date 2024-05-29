@@ -228,10 +228,15 @@ if ($result->num_rows > 0) {
 
 function openModal(id) {
     document.getElementById(id).style.display = "block";
+    const restaurantId = id.replace('restaurant', '');
+    slideIndices[restaurantId] = 0;
+    showSlides(restaurantId);
 }
 
 function closeModal(id) {
     document.getElementById(id).style.display = "none";
+    const restaurantId = id.replace('restaurant', '');
+    clearTimeout(slideTimers[restaurantId]); // Stop the slideshow when the modal is closed
 }
 
 function logout() {
@@ -343,6 +348,35 @@ function filterByLocation() {
     url.searchParams.set('location', selectedLocation);
     window.location.href = url.href;
 }
+
+let slideTimers = {}; // Store timers for each restaurant
+let slideIndices = {}; // Store slide indices for each restaurant
+
+function showSlides(restaurantId) {
+    const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+    thumbnails.forEach((thumbnail, index) => {
+        thumbnail.classList.remove('active');
+    });
+    slideIndices[restaurantId]++;
+    if (slideIndices[restaurantId] > thumbnails.length) {
+        slideIndices[restaurantId] = 1;
+    }
+    thumbnails[slideIndices[restaurantId] - 1].classList.add('active');
+    document.getElementById(`mainImage${restaurantId}`).src = thumbnails[slideIndices[restaurantId] - 1].src;
+    slideTimers[restaurantId] = setTimeout(() => showSlides(restaurantId), 2000); // Change image every 2 seconds
+}
+
+function currentSlide(index, restaurantId) {
+    clearTimeout(slideTimers[restaurantId]); // Stop the automatic slideshow
+    const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+    thumbnails.forEach((thumbnail, idx) => {
+        thumbnail.classList.remove('active');
+    });
+    thumbnails[index].classList.add('active');
+    document.getElementById(`mainImage${restaurantId}`).src = thumbnails[index].src;
+    slideIndices[restaurantId] = index + 1; // Update slide index
+}
+
 </script>
 
     </script>
