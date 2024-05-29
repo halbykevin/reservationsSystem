@@ -12,18 +12,24 @@ if ($conn->connect_error) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = $_POST['email'];
+    $email_or_name = $_POST['email_or_name'];
     $password = $_POST['password'];
     
-    if ($email == 'halbykevin@hotmail.com' && $password == 'admin') {
+    if ($email_or_name == 'halbykevin@hotmail.com' && $password == 'admin') {
         $_SESSION['user_id'] = 'admin';
         header("Location: adminIndex.html");
         exit();
     }
     
-    $sql = "SELECT * FROM users WHERE email = ?";
+    // Check if the input is an email or a name
+    if (filter_var($email_or_name, FILTER_VALIDATE_EMAIL)) {
+        $sql = "SELECT * FROM users WHERE email = ?";
+    } else {
+        $sql = "SELECT * FROM users WHERE name = ?";
+    }
+    
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("s", $email);
+    $stmt->bind_param("s", $email_or_name);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -39,10 +45,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             exit();
         } else {
-            echo "Invalid password.";
+            $error = "Invalid email or password.";
         }
     } else {
-        echo "No user found with that email address.";
+        $error = "No user found with that email or name.";
+    }
+    
+    if (isset($error)) {
+        header("Location: login.html?error=" . urlencode($error));
+        exit();
     }
 }
 
