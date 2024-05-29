@@ -94,21 +94,21 @@ if ($result->num_rows > 0) {
     </div>
 
     <div class="search-container">
-    <input type="text" id="searchBar" onkeyup="filterRestaurants()" placeholder="Search for restaurants...">
-    <select id="locationDropdown" onchange="filterByLocation()">
-        <option value="All" <?php if ($selectedLocation == 'All') echo 'selected'; ?>>All</option>
-        <?php foreach ($addresses as $address): ?>
-            <option value="<?php echo htmlspecialchars($address); ?>" <?php if ($selectedLocation == $address) echo 'selected'; ?>><?php echo htmlspecialchars($address); ?></option>
-        <?php endforeach; ?>
-    </select>
-</div>
+        <input type="text" id="searchBar" onkeyup="filterRestaurants()" placeholder="Search for restaurants...">
+        <select id="locationDropdown" onchange="filterByLocation()">
+            <option value="All" <?php if ($selectedLocation == 'All') echo 'selected'; ?>>All</option>
+            <?php foreach ($addresses as $address): ?>
+                <option value="<?php echo htmlspecialchars($address); ?>" <?php if ($selectedLocation == $address) echo 'selected'; ?>><?php echo htmlspecialchars($address); ?></option>
+            <?php endforeach; ?>
+        </select>
+    </div>
 
 
-    <div class="container" id="restaurantContainer">
+<div class="container" id="restaurantContainer">
     <?php foreach ($restaurants as $restaurant): ?>
     <div class="restaurant-box" data-name="<?php echo strtolower($restaurant['name']); ?>" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
         <div class="image-container">
-            <img src="<?php echo $restaurant['logo']; ?>" alt="<?php echo $restaurant['name']; ?>">
+            <img src="uploads/<?php echo $restaurant['logo']; ?>" alt="<?php echo $restaurant['name']; ?>">
             <div class="overlay">
                 <span class="restaurant-name"><?php echo $restaurant['name']; ?></span>
             </div>
@@ -226,123 +226,124 @@ if ($result->num_rows > 0) {
     <script>
         let currentRating = {};
 
-        function openModal(id) {
-            document.getElementById(id).style.display = "block";
+function openModal(id) {
+    document.getElementById(id).style.display = "block";
+}
+
+function closeModal(id) {
+    document.getElementById(id).style.display = "none";
+}
+
+function logout() {
+    location.href = "logout.php";
+}
+
+// Close the modal if the user clicks outside of the modal content
+window.onclick = function (event) {
+    let modals = document.querySelectorAll(".modal");
+    modals.forEach((modal) => {
+        if (event.target == modal) {
+            modal.style.display = "none";
         }
+    });
+};
 
-        function closeModal(id) {
-            document.getElementById(id).style.display = "none";
+function filterRestaurants() {
+    let input = document.getElementById('searchBar').value.toLowerCase();
+    let restaurantBoxes = document.querySelectorAll('.restaurant-box');
+    restaurantBoxes.forEach(box => {
+        let name = box.getAttribute('data-name');
+        if (name.includes(input)) {
+            box.style.display = "block";
+        } else {
+            box.style.display = "none";
         }
+    });
+}
 
-        function logout() {
-            location.href = "logout.php";
+function likeRestaurant(restaurantId) {
+    fetch('likeRestaurant.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ restaurantId: restaurantId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Restaurant liked!');
+        } else {
+            alert('Error liking restaurant.');
         }
+    });
+}
 
-        // Close the modal if the user clicks outside of the modal content
-        window.onclick = function (event) {
-            let modals = document.querySelectorAll(".modal");
-            modals.forEach((modal) => {
-                if (event.target == modal) {
-                    modal.style.display = "none";
-                }
-            });
-        };
-
-        function filterRestaurants() {
-            let input = document.getElementById('searchBar').value.toLowerCase();
-            let restaurantBoxes = document.querySelectorAll('.restaurant-box');
-            restaurantBoxes.forEach(box => {
-                let name = box.getAttribute('data-name');
-                if (name.includes(input)) {
-                    box.style.display = "block";
-                } else {
-                    box.style.display = "none";
-                }
-            });
+function rateRestaurant(restaurantId, rating) {
+    currentRating[restaurantId] = rating;
+    const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.remove('empty');
+        } else {
+            star.classList.add('empty');
         }
+    });
+    document.getElementById(`submit-rating-${restaurantId}`).style.display = "block";
+}
 
-        function likeRestaurant(restaurantId) {
-            fetch('likeRestaurant.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ restaurantId: restaurantId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Restaurant liked!');
-                } else {
-                    alert('Error liking restaurant.');
-                }
-            });
+function submitRating(restaurantId) {
+    const rating = currentRating[restaurantId];
+    fetch('rateRestaurant.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ restaurantId: restaurantId, rating: rating })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Thank you for your rating!');
+            location.reload(); // Reload the page to update the average rating
+        } else {
+            alert('Error rating restaurant.');
         }
+    });
+}
 
-        function rateRestaurant(restaurantId, rating) {
-            currentRating[restaurantId] = rating;
-            const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
-            stars.forEach((star, index) => {
-                if (index < rating) {
-                    star.classList.remove('empty');
-                } else {
-                    star.classList.add('empty');
-                }
-            });
-            document.getElementById(`submit-rating-${restaurantId}`).style.display = "block";
-        }
+function openProfileModal() {
+    document.getElementById("profileModal").style.display = "block";
+}
 
-        function submitRating(restaurantId) {
-            const rating = currentRating[restaurantId];
-            fetch('rateRestaurant.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ restaurantId: restaurantId, rating: rating })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Thank you for your rating!');
-                    location.reload(); // Reload the page to update the average rating
-                } else {
-                    alert('Error rating restaurant.');
-                }
-            });
-        }
+function closeProfileModal() {
+    document.getElementById("profileModal").style.display = "none";
+}
 
-        function openProfileModal() {
-            document.getElementById("profileModal").style.display = "block";
-        }
+function openResetPassword() {
+    document.getElementById("profileModal").style.display = "none";
+    document.getElementById("resetPasswordModal").style.display = "block";
+}
 
-        function closeProfileModal() {
-            document.getElementById("profileModal").style.display = "none";
-        }
+function closeResetPasswordModal() {
+    document.getElementById("resetPasswordModal").style.display = "none";
+}
 
-        function openResetPassword() {
-            document.getElementById("profileModal").style.display = "none";
-            document.getElementById("resetPasswordModal").style.display = "block";
-        }
+function openNav() {
+    document.getElementById("mySidebar").style.left = "0";
+}
 
-        function closeResetPasswordModal() {
-            document.getElementById("resetPasswordModal").style.display = "none";
-        }
+function closeNav() {
+    document.getElementById("mySidebar").style.left = "-250px";
+}
 
-        function openNav() {
-            document.getElementById("mySidebar").style.left = "0";
-        }
-
-        function closeNav() {
-            document.getElementById("mySidebar").style.left = "-250px";
-        }
-
-        function filterByLocation() {
+function filterByLocation() {
     const selectedLocation = document.getElementById('locationDropdown').value;
     const url = new URL(window.location.href);
     url.searchParams.set('location', selectedLocation);
     window.location.href = url.href;
 }
+</script>
 
     </script>
 </body>
