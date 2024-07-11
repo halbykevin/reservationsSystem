@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
     <link rel="stylesheet" href="stylesIndex.css" />
     <style>
       header, body {
-        background-color:white;
+        background-color: white;
       }
       .profile-icon {
         position: fixed;
@@ -80,12 +80,55 @@
       }
       .button-container {
         display: flex;
-        justify-content: center; /* Center buttons horizontally */
-        gap: 10px; /* Space between buttons */
+        justify-content: center;
+        gap: 10px;
         background-color: #fff;
         padding: 10px 0;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         width: 100%;
+      }
+      .button-container .btn {
+        font-size: 17px;
+        background: transparent;
+        border: none;
+        padding: 1em 1.5em;
+        color: black;
+        text-transform: uppercase;
+        position: relative;
+        transition: 0.5s ease;
+        cursor: pointer;
+      }
+      .button-container .btn::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 2px;
+        width: 0;
+        background-color: #ffc506;
+        transition: 0.5s ease;
+      }
+      .button-container .btn:hover {
+        color: #1e1e2b;
+        transition-delay: 0.5s;
+      }
+      .button-container .btn:hover::before {
+        width: 100%;
+      }
+      .button-container .btn::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        height: 0;
+        width: 100%;
+        background-color: #ffc506;
+        transition: 0.4s ease;
+        z-index: -1;
+      }
+      .button-container .btn:hover::after {
+        height: 100%;
+        transition-delay: 0.4s;
       }
       .main-container {
         flex: 1;
@@ -142,35 +185,29 @@
         top: 10px;
         left: 10px;
         z-index: 1;
-        display: none; /* Hide the open button initially */
+        display: none;
       }
       @media screen and (max-width: 768px) {
         .button-container {
-          display: none; /* Hide button container on small screens */
+          display: none;
         }
         .openbtn {
-          display: block; /* Show the open button on small screens */
+          display: block;
         }
       }
-      /* Slideshow container */
       .slideshow-container {
         max-width: 600px;
         position: relative;
         margin: auto;
         margin-top: 20px;
       }
-
-      /* Hide the images by default */
       .mySlides {
         display: none;
       }
-
-      /* Fade animation */
       .fade {
         animation-name: fade;
         animation-duration: 1.5s;
       }
-
       @keyframes fade {
         from {
           opacity: 0.4;
@@ -179,8 +216,6 @@
           opacity: 1;
         }
       }
-
-      /* Dots/bullets/indicators */
       .dot {
         cursor: pointer;
         height: 15px;
@@ -191,7 +226,6 @@
         display: inline-block;
         transition: background-color 0.6s ease;
       }
-
       .active,
       .dot:hover {
         background-color: #717171;
@@ -199,201 +233,168 @@
       .dots-container {
         text-align: center;
         position: relative;
-        top: -30px; /* Adjust this value to move the dots higher */
+        top: -30px;
         z-index: 1;
       }
       .logo {
         display: block;
-        margin: 20px auto; /* Centers the logo horizontally */
-        width: 300px; /* Adjust the size as needed */
-        height: auto; /* Maintains the aspect ratio */
+        margin: 20px auto;
+        width: 300px;
+        height: auto;
       }
-      
     </style>
-  </head>
-  <body>
+</head>
+<body>
 
 <img src="uploads/logo.png" class="logo" alt="logo" />
 
-    <div class="button-container">
-      <button onclick="location.href='index.html'">Home</button>
-      <button onclick="location.href='discover.php'">Discover</button>
-      <button onclick="location.href='liked.php'">Liked</button>
-      <button onclick="location.href='myPoints.php'">My Points</button>
-      <button onclick="logout()">Logout</button>
-    </div>
+<div class="button-container">
+    <button class="btn" onclick="location.href='index.html'">Home</button>
+    <button class="btn" onclick="location.href='discover.php'">Discover</button>
+    <button class="btn" onclick="location.href='liked.php'">Liked</button>
+    <button class="btn" onclick="location.href='myPoints.php'">My Points</button>
+    <button class="btn" onclick="logout()">Logout</button>
+</div>
 
-    <img
-      src="images/icons/user-avatar.png"
-      class="profile-icon"
-      alt="Profile Icon"
-      onclick="openProfileModal()"
-    />
+<img src="images/icons/user-avatar.png" class="profile-icon" alt="Profile Icon" onclick="openProfileModal()" />
 
-    <button class="openbtn" onclick="openNav()">☰</button>
+<button class="openbtn" onclick="openNav()">☰</button>
 
-    <div id="mySidebar" class="sidebar">
-      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-      <a href="index.html">Home</a>
-      <a href="discover.php">Discover</a>
-      <a href="liked.php">Liked</a>
-      <a href="myPoints.php">My Points</a>
-      <a href="javascript:logout()">Logout</a>
-    </div>
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+    <a href="index.html">Home</a>
+    <a href="discover.php">Discover</a>
+    <a href="liked.php">Liked</a>
+    <a href="myPoints.php">My Points</a>
+    <a href="javascript:logout()">Logout</a>
+</div>
 
-    <div id="profileModal" class="profile-modal">
-      <div class="profile-modal-content">
-        <span class="close-profile-modal" onclick="closeProfileModal()"
-          >&times;</span
-        >
+<div id="profileModal" class="profile-modal">
+    <div class="profile-modal-content">
+        <span class="close-profile-modal" onclick="closeProfileModal()">&times;</span>
         <h2>Edit Profile</h2>
-        <form
-          action="updateProfile.php"
-          method="post"
-          enctype="multipart/form-data"
-        >
-          <div class="form-group">
-            <label for="profilePicture">Profile Picture:</label>
-            <input
-              type="file"
-              id="profilePicture"
-              name="profilePicture"
-              accept="image/*"
-            />
-          </div>
-          <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required />
-          </div>
-          <div class="form-group">
-            <label for="phone">Phone Number:</label>
-            <input type="tel" id="phone" name="phone" required />
-          </div>
-          <div class="form-group">
-            <label for="oldPassword">Old Password:</label>
-            <input
-              type="password"
-              id="oldPassword"
-              name="oldPassword"
-              required
-            />
-          </div>
-          <button type="submit">Update Profile</button>
+        <form action="updateProfile.php" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="profilePicture">Profile Picture:</label>
+                <input type="file" id="profilePicture" name="profilePicture" accept="image/*" />
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" name="email" required />
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number:</label>
+                <input type="tel" id="phone" name="phone" required />
+            </div>
+            <div class="form-group">
+                <label for="oldPassword">Old Password:</label>
+                <input type="password" id="oldPassword" name="oldPassword" required />
+            </div>
+            <button type="submit">Update Profile</button>
         </form>
         <br />
         <button onclick="openResetPassword()">Reset Password</button>
-      </div>
     </div>
+</div>
 
-    <div class="slideshow-container">
-      <div class="mySlides fade">
+<div class="slideshow-container">
+    <div class="mySlides fade">
         <img src="uploads/oopsLogo.png" style="width: 100%" />
-      </div>
-      <div class="mySlides fade">
+    </div>
+    <div class="mySlides fade">
         <img src="uploads/restaurant1.jpg" style="width: 100%" />
-      </div>
-      <div class="mySlides fade">
+    </div>
+    <div class="mySlides fade">
         <img src="uploads/restaurant3.jpg" style="width: 100%" />
-      </div>
     </div>
-    <br />
+</div>
+<br />
 
-    <div class="dots-container">
-      <span class="dot" onclick="currentSlide(1)"></span>
-      <span class="dot" onclick="currentSlide(2)"></span>
-      <span class="dot" onclick="currentSlide(3)"></span>
-    </div>
+<div class="dots-container">
+    <span class="dot" onclick="currentSlide(1)"></span>
+    <span class="dot" onclick="currentSlide(2)"></span>
+    <span class="dot" onclick="currentSlide(3)"></span>
+</div>
 
-    <div id="resetPasswordModal" class="profile-modal">
-      <div class="profile-modal-content">
-        <span class="close-profile-modal" onclick="closeResetPasswordModal()"
-          >&times;</span
-        >
+<div id="resetPasswordModal" class="profile-modal">
+    <div class="profile-modal-content">
+        <span class="close-profile-modal" onclick="closeResetPasswordModal()">&times;</span>
         <h2>Reset Password</h2>
         <form action="resetPassword.php" method="post">
-          <div class="form-group">
-            <label for="resetOldPassword">Old Password:</label>
-            <input
-              type="password"
-              id="resetOldPassword"
-              name="oldPassword"
-              required
-            />
-          </div>
-          <div class="form-group">
-            <label for="resetNewPassword">New Password:</label>
-            <input
-              type="password"
-              id="resetNewPassword"
-              name="newPassword"
-              required
-            />
-          </div>
-          <button type="submit">Reset Password</button>
+            <div class="form-group">
+                <label for="resetOldPassword">Old Password:</label>
+                <input type="password" id="resetOldPassword" name="oldPassword" required />
+            </div>
+            <div class="form-group">
+                <label for="resetNewPassword">New Password:</label>
+                <input type="password" id="resetNewPassword" name="newPassword" required />
+            </div>
+            <button type="submit">Reset Password</button>
         </form>
-      </div>
     </div>
+</div>
 
-    <script>
-      function openProfileModal() {
+<script>
+    function openProfileModal() {
         document.getElementById("profileModal").style.display = "block";
-      }
+    }
 
-      function closeProfileModal() {
+    function closeProfileModal() {
         document.getElementById("profileModal").style.display = "none";
-      }
+    }
 
-      function openResetPassword() {
+    function openResetPassword() {
         document.getElementById("profileModal").style.display = "none";
         document.getElementById("resetPasswordModal").style.display = "block";
-      }
+    }
 
-      function closeResetPasswordModal() {
+    function closeResetPasswordModal() {
         document.getElementById("resetPasswordModal").style.display = "none";
-      }
+    }
 
-      function logout() {
+    function logout() {
         location.href = "logout.php";
-      }
+    }
 
-      function openNav() {
+    function openNav() {
         document.getElementById("mySidebar").style.left = "0";
-      }
+    }
 
-      function closeNav() {
+    function closeNav() {
         document.getElementById("mySidebar").style.left = "-250px";
-      }
-      let slideIndex = 0;
-      showSlides(slideIndex);
+    }
 
-      function plusSlides(n) {
+    let slideIndex = 0;
+    showSlides(slideIndex);
+
+    function plusSlides(n) {
         showSlides((slideIndex += n));
-      }
+    }
 
-      function currentSlide(n) {
+    function currentSlide(n) {
         showSlides((slideIndex = n));
-      }
+    }
 
-      showSlides();
+    showSlides();
 
-      function showSlides() {
+    function showSlides() {
         let i;
         let slides = document.getElementsByClassName("mySlides");
         let dots = document.getElementsByClassName("dot");
         for (i = 0; i < slides.length; i++) {
-          slides[i].style.display = "none";
+            slides[i].style.display = "none";
         }
         slideIndex++;
         if (slideIndex > slides.length) {
-          slideIndex = 1;
+            slideIndex = 1;
         }
         for (i = 0; i < dots.length; i++) {
-          dots[i].className = dots[i].className.replace(" active", "");
+            dots[i].className = dots[i].className.replace(" active", "");
         }
         slides[slideIndex - 1].style.display = "block";
         dots[slideIndex - 1].className += " active";
         setTimeout(showSlides, 2000); // Change image every 2 seconds
-      }
-    </script>
-  </body>
+    }
+</script>
+</body>
 </html>
