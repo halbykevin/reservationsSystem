@@ -25,6 +25,10 @@ if ($result->num_rows > 0) {
 </head>
 <body>
 <style>
+    header,
+      body {
+        background-color: white;
+      }
         .profile-icon {
             position: fixed;
             top: 10px;
@@ -209,13 +213,19 @@ if ($result->num_rows > 0) {
         bottom: 0;
         height: 0;
         width: 100%;
-        background-color: #ffc506;
+        background-color: black;
         transition: 0.4s ease;
         z-index: -1;
       }
       .button-container .btn:hover::after {
         height: 100%;
         transition-delay: 0.4s;
+      }
+      .logo {
+        display: block;
+        margin: 20px auto;
+        width: 150px;
+        height: auto;
       }
     </style>
 

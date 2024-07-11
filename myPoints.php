@@ -21,6 +21,10 @@ $points = $user['points'];
 </head>
 <body>
     <style>
+      header,
+      body {
+        background-color: white;
+      }
         .button-container {
         display: flex;
         justify-content: center; /* Center buttons horizontally */
@@ -136,13 +140,19 @@ display: none; /* Hide the open button initially */
         bottom: 0;
         height: 0;
         width: 100%;
-        background-color: #ffc506;
+        background-color: black;
         transition: 0.4s ease;
         z-index: -1;
       }
       .button-container .btn:hover::after {
         height: 100%;
         transition-delay: 0.4s;
+      }
+      .logo {
+        display: block;
+        margin: 20px auto;
+        width: 150px;
+        height: auto;
       }
     </style>
     <img src="uploads/logo.png" class="logo" alt="logo" />

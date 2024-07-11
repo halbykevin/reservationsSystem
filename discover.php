@@ -66,6 +66,10 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="stylesDiscover2.css">
     <link rel="stylesheet" href="stylesDiscover3.css">
     <style>
+        header,
+      body {
+        background-color: white;
+      }
         .button-container .btn {
         font-size: 17px;
         background: transparent;
@@ -84,7 +88,7 @@ if ($result->num_rows > 0) {
         bottom: 0;
         height: 2px;
         width: 0;
-        background-color: #ffc506;
+        background-color: black;
         transition: 0.5s ease;
       }
       .button-container .btn:hover {
@@ -112,7 +116,7 @@ if ($result->num_rows > 0) {
       .logo {
         display: block;
         margin: 20px auto;
-        width: 300px;
+        width: 150px;
         height: auto;
       }
     </style>
