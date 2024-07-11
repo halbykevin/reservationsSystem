@@ -6,6 +6,9 @@
     <title>Home</title>
     <link rel="stylesheet" href="stylesIndex.css" />
     <style>
+      header, body {
+        background-color:white;
+      }
       .profile-icon {
         position: fixed;
         top: 10px;
@@ -199,9 +202,19 @@
         top: -30px; /* Adjust this value to move the dots higher */
         z-index: 1;
       }
+      .logo {
+        display: block;
+        margin: 20px auto; /* Centers the logo horizontally */
+        width: 300px; /* Adjust the size as needed */
+        height: auto; /* Maintains the aspect ratio */
+      }
+      
     </style>
   </head>
   <body>
+
+<img src="uploads/logo.png" class="logo" alt="logo" />
+
     <div class="button-container">
       <button onclick="location.href='index.html'">Home</button>
       <button onclick="location.href='discover.php'">Discover</button>
