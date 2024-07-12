@@ -66,6 +66,16 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="stylesDiscover2.css">
     <link rel="stylesheet" href="stylesDiscover3.css">
     <style>
+        .footer {
+    background-color: red;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
         header,
       body {
         background-color: white;
@@ -438,5 +448,9 @@ function currentSlide(index, restaurantId) {
 </script>
 
     </script>
+    <footer class="footer">
+        © All rights reserved
+    </footer>
+
 </body>
 </html>

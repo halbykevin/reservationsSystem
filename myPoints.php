@@ -21,6 +21,16 @@ $points = $user['points'];
 </head>
 <body>
     <style>
+      .footer {
+    background-color: red;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+
       header,
       body {
         background-color: white;
@@ -193,5 +203,9 @@ display: none; /* Hide the open button initially */
         document.getElementById("mySidebar").style.left = "-250px";
       }
     </script>
+        <footer class="footer">
+        © All rights reserved
+    </footer>
+
 </body>
 </html>
