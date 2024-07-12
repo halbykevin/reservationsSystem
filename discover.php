@@ -176,8 +176,8 @@ if ($result->num_rows > 0) {
     <?php foreach ($restaurants as $restaurant): ?>
     <div class="restaurant-box" data-name="<?php echo strtolower($restaurant['name']); ?>" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
         <div class="image-container">
-            <img src="uploads/<?php echo $restaurant['logo']; ?>" alt="<?php echo $restaurant['name']; ?>">
-            <div class="overlay">
+        <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
+        <div class="overlay">
                 <span class="restaurant-name"><?php echo $restaurant['name']; ?></span>
             </div>
         </div>

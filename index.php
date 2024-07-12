@@ -264,14 +264,17 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
     top: 200px; /* Adjust the top value as needed */
     left: 20px; /* Adjust the left value as needed */
 }
-        .greeting-container h1 {
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
-        .greeting-container .small-text {
-            font-size: 16px;
-            color: #666;
-        }
+
+.greeting-container h1 {
+    font-size: 24px;
+    margin-bottom: 5px; /* Reduce the bottom margin */
+}
+
+.greeting-container .small-text {
+    font-size: 16px;
+    color: #666;
+    margin-top: 0; /* Remove the top margin */
+}
         @media screen and (max-width: 768px) {
     .logo {
         width: 100px; /* Smaller width for mobile */

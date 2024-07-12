@@ -30,11 +30,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Ensure the logo path is correctly stored
-$logoPath = $target_file ? $target_file : null;
-$sql = "INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("issssssss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $logoPath);
-
+    $logoPath = $target_file ? $target_file : null;
+    $sql = "INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("issssssss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $logoPath);
 
     if ($stmt->execute()) {
         $restaurantId = $stmt->insert_id;
