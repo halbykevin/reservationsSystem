@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
         $stmt->execute();
 
-        header("Location: index.html?profile_updated=1");
+        header("Location: index.php?profile_updated=1");
     } else {
         echo "Invalid old password.";
     }

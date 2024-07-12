@@ -17,7 +17,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     
     if ($email_or_name == 'halbykevin@hotmail.com' && $password == 'admin') {
         $_SESSION['user_id'] = 'admin';
-        header("Location: adminIndex.html");
+        $_SESSION['user_name'] = 'Admin';
+        header("Location: adminIndex.php");
         exit();
     }
     
@@ -34,14 +35,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
+        $row = $result->fetch_assoc(); // Only call get_result() once
         if (password_verify($password, $row['password'])) {
             $_SESSION['user_id'] = $row['id'];
+            $_SESSION['user_name'] = $row['name'];
             $_SESSION['account_type'] = $row['account_type'];
             if ($row['account_type'] == 'restaurant') {
                 header("Location: indexR.html");
             } else {
-                header("Location: index.html");
+                header("Location: index.php");
             }
             exit();
         } else {

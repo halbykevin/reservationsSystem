@@ -136,7 +136,7 @@ if ($result->num_rows > 0) {
 <img src="uploads/logo.png" class="logo" alt="logo" />
 
 <div class="button-container">
-    <button class="btn" onclick="location.href='index.html'">Home</button>
+    <button class="btn" onclick="location.href='index.php'">Home</button>
     <button class="btn" onclick="location.href='discover.php'">Discover</button>
     <button class="btn" onclick="location.href='liked.php'">Liked</button>
     <button class="btn" onclick="location.href='myPoints.php'">My Points</button>
@@ -154,7 +154,7 @@ if ($result->num_rows > 0) {
 
     <div id="mySidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-        <a href="index.html">Home</a>
+        <a href="index.php">Home</a>
         <a href="discover.php">Discover</a>
         <a href="liked.php">Liked</a>
         <a href="myPoints.php">My Points</a>

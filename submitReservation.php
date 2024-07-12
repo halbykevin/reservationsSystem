@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $stmt->bind_param("iisssssssi", $userId, $restaurantId, $fullName, $birthdate, $reservationDate, $reservationTime, $seating, $specialRequests, $phone, $numPeople);
 
     if ($stmt->execute()) {
-        header("Location: index.html?success=1");
+        header("Location: index.php?success=1");
     } else {
         echo "Error: " . $stmt->error;
     }
