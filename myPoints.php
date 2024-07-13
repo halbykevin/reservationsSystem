@@ -21,6 +21,24 @@ $points = $user['points'];
 </head>
 <body>
     <style>
+      .points-container {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.point {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background-color: #ccc; /* Gray for empty points */
+}
+
+.point.filled {
+    background-color: #4caf50; /* Green for filled points */
+}
+
       .footer {
     background-color: red;
     color: white;
@@ -187,9 +205,13 @@ display: none; /* Hide the open button initially */
     </div>
 
     <div class="container">
-        <h1>My Points</h1>
-        <p>You have <strong><?php echo $points; ?></strong> points.</p>
+    <h1>My Points</h1>
+    <div class="points-container">
+        <?php for ($i = 1; $i <= 10; $i++): ?>
+            <div class="point <?php echo ($i <= $points) ? 'filled' : ''; ?>"></div>
+        <?php endfor; ?>
     </div>
+</div>
     <script>
         function logout() {
             location.href = "logout.php";

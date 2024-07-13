@@ -57,16 +57,18 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if ($stmt->execute()) {
         if ($status == 'accepted') {
             // Calculate points
-            $points = 5 * $numPeople;
-            $sql = "UPDATE users SET points = points + ? WHERE id = ?";
-            $stmt = $conn->prepare($sql);
-            if (!$stmt) {
-                $response['error'] = 'Prepare statement failed: ' . $conn->error;
-                echo json_encode($response);
-                exit;
-            }
-            $stmt->bind_param("ii", $points, $userId);
-            $stmt->execute();
+            // Add 1 point for each successful reservation
+$points = 1;
+$sql = "UPDATE users SET points = points + ? WHERE id = ?";
+$stmt = $conn->prepare($sql);
+if (!$stmt) {
+    $response['error'] = 'Prepare statement failed: ' . $conn->error;
+    echo json_encode($response);
+    exit;
+}
+$stmt->bind_param("ii", $points, $userId);
+$stmt->execute();
+
         }
         // Move the reservation to history
         $sql = "INSERT INTO reservations_history SELECT * FROM reservations WHERE id = ?";
