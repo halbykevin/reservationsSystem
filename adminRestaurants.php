@@ -76,5 +76,6 @@ if ($result->num_rows > 0) {
         </div>
         <?php endforeach; ?>
     </div>
+    <button onclick="location.href='adminIndex.html'">Back</button>
 </body>
 </html>

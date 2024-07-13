@@ -35,7 +35,7 @@ if ($result->num_rows > 0) {
     <title>Promotion Rest</title>
     <link rel="stylesheet" href="stylesAdminIndex.css">
 </head>
-<body>
+<body><button onclick="location.href='adminIndex.html'">Back</button>
     <h1>Promotional Restaurants</h1>
     <form method="post" action="promotionRest.php">
         <label for="restaurant_id">Select Restaurant:</label>
