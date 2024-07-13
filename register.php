@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $birthdate = $_POST['birthdate'];
     $phone = $_POST['phone'];
     $email = $_POST['email'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $password = $_POST['password']; // Store password as plain text
     $account_type = $_POST['account_type'];
     
     $sql = "INSERT INTO users (name, birthdate, phone, email, password, account_type) VALUES ('$name', '$birthdate', '$phone', '$email', '$password', '$account_type')";
