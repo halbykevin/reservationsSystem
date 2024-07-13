@@ -36,7 +36,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc(); // Only call get_result() once
-        if (password_verify($password, $row['password'])) {
+        // Compare plain text passwords
+        if ($password == $row['password']) {
             $_SESSION['user_id'] = $row['id'];
             $_SESSION['user_name'] = $row['name'];
             $_SESSION['account_type'] = $row['account_type'];
