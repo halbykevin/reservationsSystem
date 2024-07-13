@@ -1,6 +1,34 @@
 <?php
 session_start();
+require 'db.php';
+
 $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
+
+// Fetch promotional restaurants
+$sql = "SELECT restaurants.*, IFNULL(AVG(ratings.rating), 0) AS avg_rating, COUNT(ratings.id) AS num_ratings
+        FROM restaurants
+        LEFT JOIN ratings ON restaurants.id = ratings.restaurant_id
+        WHERE restaurants.is_promotional = 1
+        GROUP BY restaurants.id";
+$result = $conn->query($sql);
+
+$promotional_restaurants = [];
+if ($result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $restaurantId = $row['id'];
+        $imageSql = "SELECT image_path FROM restaurant_images WHERE restaurant_id = ?";
+        $imageStmt = $conn->prepare($imageSql);
+        $imageStmt->bind_param("i", $restaurantId);
+        $imageStmt->execute();
+        $imageResult = $imageStmt->get_result();
+        $images = [];
+        while ($imageRow = $imageResult->fetch_assoc()) {
+            $images[] = $imageRow['image_path'];
+        }
+        $row['images'] = $images;
+        $promotional_restaurants[] = $row;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -11,6 +39,106 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
     <title>Home</title>
     <link rel="stylesheet" href="stylesIndex.css" />
     <style>
+
+    /* Ensure modal covers the entire page */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; /* Could be more or less, depending on screen size */
+    height: 90%; /* Make the modal content cover most of the screen */
+    max-width: 1200px;
+    max-height: 800px;
+    border-radius: 10px;
+    overflow: auto; /* Enable scrolling inside the modal content */
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+        .recommended-container .container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start; /* Ensure items are aligned to the left */
+}
+.recommended-container {
+    margin: 20px 20px;
+    position: absolute;
+    top: 300px; /* Adjust this value as needed to place it correctly */
+    left: 20px; /* Adjust this value as needed to place it correctly */
+}
+
+        .recommended-container h2 {
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        .restaurant-box-landscape {
+            left: -16px;
+            position: relative;
+            margin: 15px;
+            width: 300px; /* Set the width to make it landscape */
+            height: 200px; /* Adjust the height to maintain aspect ratio */
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+        }
+
+        .restaurant-box-landscape img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.3s ease;
+        }
+
+        .restaurant-box-landscape .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .restaurant-box-landscape:hover img {
+            opacity: 0.3;
+        }
+
+        .restaurant-box-landscape:hover .overlay {
+            opacity: 1;
+        }
+
         header,
         body {
             background-color: white;
@@ -258,28 +386,119 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
             bottom: 0;
         }
         .greeting-container {
-    text-align: left;
-    margin: 20px 20px;
-    position: absolute;
-    top: 200px; /* Adjust the top value as needed */
-    left: 20px; /* Adjust the left value as needed */
-}
+            text-align: left;
+            margin: 20px 20px;
+            position: absolute;
+            top: 200px; /* Adjust the top value as needed */
+            left: 20px; /* Adjust the left value as needed */
+        }
 
-.greeting-container h1 {
-    font-size: 24px;
-    margin-bottom: 5px; /* Reduce the bottom margin */
-}
+        .greeting-container h1 {
+            font-size: 24px;
+            margin-bottom: 5px; /* Reduce the bottom margin */
+        }
 
-.greeting-container .small-text {
-    font-size: 16px;
-    color: #666;
-    margin-top: 0; /* Remove the top margin */
-}
+        .greeting-container .small-text {
+            font-size: 16px;
+            color: #666;
+            margin-top: 0; /* Remove the top margin */
+        }
         @media screen and (max-width: 768px) {
-    .logo {
-        width: 100px; /* Smaller width for mobile */
-    }
+            .logo {
+                width: 100px; /* Smaller width for mobile */
+            }
+        }
+        .main-image-frame {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
 }
+
+.main-image {
+    max-width: 60%; /* Smaller size for the main image */
+    height: auto;
+    border-radius: 10px;
+}
+
+.thumbnail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.thumbnail {
+    width: 10%; /* Smaller size for thumbnails */
+    height: auto;
+    margin-bottom: 10px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: transform 0.2s;
+}
+
+.thumbnail:hover {
+    transform: scale(1.05);
+}
+
+.thumbnail.active {
+    border: 2px solid #007bff;
+}
+
+.bio-frame {
+    text-align: center; /* Center the bio text */
+}
+
+.open-hours,
+.location,
+button {
+    text-align: center; /* Center the open hours and location */
+}
+
+.submit-rating {
+    display: none; /* Hide the Submit Rating button by default */
+}
+
+button.reserve-now {
+    display: none; /* Hide the Reserve Now button by default */
+}
+
+.features {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center; /* Center the feature bubbles */
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.feature-bubble {
+    background-color: #f0f0f0;
+    border-radius: 50px;
+    padding: 10px 20px;
+    text-align: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.heart-button {
+    font-size: 24px;
+    cursor: pointer;
+    color: transparent; /* Initial state with no color fill */
+    border: none; /* Remove border */
+    background-color: transparent; /* Transparent background */
+    transition: color 0.3s;
+}
+
+.heart-button::before {
+    content: '❤'; /* Unicode character for heart */
+    color: red; /* Red color for the heart outline */
+}
+
+.heart-button.liked::before {
+    color: red; /* Fill color when liked */
+}
+
     </style>
 </head>
 <body>
@@ -355,6 +574,79 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
         <p class="small-text">Let's reserve a table for you</p>
     </div>
 
+    <div class="recommended-container">
+        <h2>Recommended for you</h2>
+        <div class="container">
+            <?php foreach ($promotional_restaurants as $restaurant): ?>
+            <div class="restaurant-box-landscape" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
+                <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
+                <div class="overlay">
+                    <span class="restaurant-name"><?php echo $restaurant['name']; ?></span>
+                </div>
+            </div>
+
+            <div id="restaurant<?php echo $restaurant['id']; ?>" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal('restaurant<?php echo $restaurant['id']; ?>')">X</span>
+                    <div class="main-image-frame">
+                        <img src="<?php echo $restaurant['images'][0]; ?>" class="main-image" id="mainImage<?php echo $restaurant['id']; ?>" alt="<?php echo $restaurant['name']; ?>">
+                    </div>
+                    <div class="thumbnail-container">
+                        <?php foreach ($restaurant['images'] as $index => $imagePath): ?>
+                        <img src="<?php echo $imagePath; ?>" class="thumbnail" alt="<?php echo $restaurant['name']; ?>" onclick="currentSlide(<?php echo $index; ?>, '<?php echo $restaurant['id']; ?>')">
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="bio-frame">
+                        <p class="bio"><?php echo $restaurant['bio']; ?></p>
+                    </div>
+                        
+                    <!-- Display features -->
+                    <div class="features">
+                        <?php 
+                        $features = explode(',', $restaurant['features']); 
+                        foreach ($features as $feature) {
+                            echo "<span class='feature-bubble'>" . htmlspecialchars(trim($feature)) . "</span>";
+                        }
+                        ?>
+                    </div>
+                        
+                    <!-- Display open hours -->
+                    <div class="open-hours">
+                        <h3>Open Hours</h3>
+                        <?php 
+                        $open_hours = explode("\n", $restaurant['open_hours']);
+                        foreach ($open_hours as $hours) {
+                            echo "<p>" . htmlspecialchars(trim($hours)) . "</p>";
+                        }
+                        ?>
+                    </div>
+                        
+                    <iframe
+                        src="<?php echo htmlspecialchars($restaurant['location']); ?>"
+                        width="50%"
+                        height="600"
+                        style="border:0;"
+                        allowfullscreen=""
+                        loading="lazy">
+                    </iframe>
+                    <p><a href="<?php echo htmlspecialchars($restaurant['location']); ?>" target="_blank">View on Google Maps</a></p>
+                    <button class="reserve-now" onclick="location.href='reserveForm.html?restaurantId=<?php echo $restaurant['id']; ?>'">Reserve Now</button>
+                    <span class="heart-button" onclick="likeRestaurant(<?php echo $restaurant['id']; ?>)"></span>
+                    <div class="rating-container">
+                        <div class="stars" data-restaurant-id="<?php echo $restaurant['id']; ?>">
+                            <?php for ($i = 1; $i <= 5; $i++): ?>
+                                <span class="star <?php echo $i <= round($restaurant['avg_rating']) ? '' : 'empty'; ?>" onclick="rateRestaurant(<?php echo $restaurant['id']; ?>, <?php echo $i; ?>)">★</span>
+                            <?php endfor; ?>
+                        </div>
+                        <div class="num-ratings">(<?php echo $restaurant['num_ratings']; ?>)</div>
+                        <button class="submit-rating" id="submit-rating-<?php echo $restaurant['id']; ?>" onclick="submitRating(<?php echo $restaurant['id']; ?>)">Submit Rating</button>
+                        </div>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
     <script>
         function openProfileModal() {
             document.getElementById("profileModal").style.display = "block";
@@ -384,6 +676,138 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
         function closeNav() {
             document.getElementById("mySidebar").style.left = "-250px";
         }
+
+        function openModal(id) {
+    document.getElementById(id).style.display = "block";
+    const restaurantId = id.replace('restaurant', '');
+    slideIndices[restaurantId] = 0;
+    showSlides(restaurantId);
+    document.querySelector(`#${id} .reserve-now`).style.display = "block"; // Show Reserve Now button
+}
+
+        function closeModal(id) {
+            document.getElementById(id).style.display = "none";
+            const restaurantId = id.replace('restaurant', '');
+            clearTimeout(slideTimers[restaurantId]); // Stop the slideshow when the modal is closed
+        }
+
+        let currentRating = {};
+        let slideTimers = {}; // Store timers for each restaurant
+        let slideIndices = {}; // Store slide indices for each restaurant
+
+        function showSlides(restaurantId) {
+            const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+            thumbnails.forEach((thumbnail, index) => {
+                thumbnail.classList.remove('active');
+            });
+            slideIndices[restaurantId]++;
+            if (slideIndices[restaurantId] > thumbnails.length) {
+                slideIndices[restaurantId] = 1;
+            }
+            thumbnails[slideIndices[restaurantId] - 1].classList.add('active');
+            document.getElementById(`mainImage${restaurantId}`).src = thumbnails[slideIndices[restaurantId] - 1].src;
+            slideTimers[restaurantId] = setTimeout(() => showSlides(restaurantId), 2000); // Change image every 2 seconds
+        }
+
+        function currentSlide(index, restaurantId) {
+            clearTimeout(slideTimers[restaurantId]); // Stop the automatic slideshow
+            const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+            thumbnails.forEach((thumbnail, idx) => {
+                thumbnail.classList.remove('active');
+            });
+            thumbnails[index].classList.add('active');
+            document.getElementById(`mainImage${restaurantId}`).src = thumbnails[index].src;
+            slideIndices[restaurantId] = index + 1; // Update slide index
+        }
+
+        function filterRestaurants() {
+            let input = document.getElementById('searchBar').value.toLowerCase();
+            let restaurantBoxes = document.querySelectorAll('.restaurant-box');
+            restaurantBoxes.forEach(box => {
+                let name = box.getAttribute('data-name');
+                if (name.includes(input)) {
+                    box.style.display = "block";
+                } else {
+                    box.style.display = "none";
+                }
+            });
+        }
+
+        function filterByLocation() {
+            const selectedLocation = document.getElementById('locationDropdown').value;
+            const url = new URL(window.location.href);
+            url.searchParams.set('location', selectedLocation);
+            window.location.href = url.href;
+        }
+
+        function likeRestaurant(restaurantId) {
+    fetch('likeRestaurant.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ restaurantId: restaurantId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Restaurant liked!');
+            document.querySelector(`#restaurant${restaurantId} .heart-button`).classList.toggle('liked');
+        } else {
+            alert('Error liking restaurant.');
+        }
+    });
+}
+
+
+
+
+        function rateRestaurant(restaurantId, rating) {
+    currentRating[restaurantId] = rating;
+    const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.remove('empty');
+        } else {
+            star.classList.add('empty');
+        }
+    });
+    document.getElementById(`submit-rating-${restaurantId}`).style.display = "block"; // Show Submit Rating button
+}
+
+        function submitRating(restaurantId) {
+            const rating = currentRating[restaurantId];
+            fetch('rateRestaurant.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ restaurantId: restaurantId, rating: rating })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Thank you for your rating!');
+                    location.reload(); // Reload the page to update the average rating
+                } else {
+                    alert('Error rating restaurant.');
+                }
+            });
+        }
+        function showSlides(restaurantId) {
+    const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+    thumbnails.forEach((thumbnail, index) => {
+        thumbnail.classList.remove('active');
+    });
+    slideIndices[restaurantId]++;
+    if (slideIndices[restaurantId] > thumbnails.length) {
+        slideIndices[restaurantId] = 1;
+    }
+    thumbnails[slideIndices[restaurantId] - 1].classList.add('active');
+    document.getElementById(`mainImage${restaurantId}`).src = thumbnails[slideIndices[restaurantId] - 1].src;
+    slideTimers[restaurantId] = setTimeout(() => showSlides(restaurantId), 1000); // Change image every 1 second
+}
+
     </script>
     <footer class="footer">
         © All rights reserved

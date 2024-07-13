@@ -18,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($email_or_name == 'halbykevin@hotmail.com' && $password == 'admin') {
         $_SESSION['user_id'] = 'admin';
         $_SESSION['user_name'] = 'Admin';
-        header("Location: adminIndex.php");
+        header("Location: adminIndex.html");
         exit();
     }
     
