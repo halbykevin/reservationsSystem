@@ -376,15 +376,21 @@ if ($result->num_rows > 0) {
             width: 150px;
             height: auto;
         }
-        .footer {
-            background-color: grey;
-            color: white;
-            text-align: center;
-            padding: 30px 0;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
+        body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.footer {
+    background-color: grey;
+    color: white;
+    text-align: center;
+    padding: 10px 0; /* Thinner padding */
+    width: 100%;
+    margin-top: auto; /* Pushes footer to the bottom */
+}
+
         .greeting-container {
             text-align: left;
             margin: 20px 20px;
@@ -408,6 +414,21 @@ if ($result->num_rows > 0) {
                 width: 100px; /* Smaller width for mobile */
             }
         }
+        @media screen and (max-width: 768px) {
+    .greeting-container {
+        top: 100px; /* Adjust the top value as needed */
+    }
+}
+@media screen and (max-width: 768px) {
+    .greeting-container {
+        top: 80px; /* Adjust the top value as needed */
+    }
+    .recommended-container {
+        top: 170px; /* Adjust the top value as needed */
+    }
+}
+
+
         .main-image-frame {
     width: 100%;
     display: flex;
