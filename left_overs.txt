@@ -1,3 +1,1 @@
-I want the top buttons to be when on any page to be active in maybe different color mode
-or more opacity
 I want an automation for the reservation status via sms or email or whatsapp
