@@ -3,6 +3,15 @@ session_start();
 require 'db.php';
 
 $userId = $_SESSION['user_id'];
+
+// Handle redeem action
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['redeem'])) {
+    $sql = "UPDATE users SET points = points - 10 WHERE id = ? AND points >= 10";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+}
+
 $sql = "SELECT points FROM users WHERE id = ?";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param("i", $userId);
@@ -11,6 +20,7 @@ $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 $points = $user['points'];
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,38 +32,38 @@ $points = $user['points'];
 <body>
     <style>
       .points-container {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    margin: 20px 0;
-}
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        margin: 20px 0;
+      }
 
-.point {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    background-color: #ccc; /* Gray for empty points */
-}
+      .point {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background-color: #ccc; /* Gray for empty points */
+      }
 
-.point.filled {
-    background-color: #4caf50; /* Green for filled points */
-}
+      .point.filled {
+        background-color: #4caf50; /* Green for filled points */
+      }
 
       .footer {
-    background-color: red;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-}
+        background-color: red;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+      }
 
       header,
       body {
         background-color: white;
       }
-        .button-container {
+      .button-container {
         display: flex;
         justify-content: center; /* Center buttons horizontally */
         gap: 10px; /* Space between buttons */
@@ -117,7 +127,7 @@ $points = $user['points'];
         top: 10px;
         left: 10px;
         z-index: 1;
-display: none; /* Hide the open button initially */
+        display: none; /* Hide the open button initially */
       }
       @media screen and (max-width: 768px) {
         .button-container {
@@ -186,16 +196,16 @@ display: none; /* Hide the open button initially */
     <img src="uploads/logo.png" class="logo" alt="logo" />
 
     <div class="button-container">
-    <button class="btn" onclick="location.href='index.php'">Home</button>
-    <button class="btn" onclick="location.href='discover.php'">Discover</button>
-    <button class="btn" onclick="location.href='liked.php'">Liked</button>
-    <button class="btn" onclick="location.href='myPoints.php'">My Points</button>
-    <button class="btn" onclick="logout()">Logout</button>
-</div>
+      <button class="btn" onclick="location.href='index.php'">Home</button>
+      <button class="btn" onclick="location.href='discover.php'">Discover</button>
+      <button class="btn" onclick="location.href='liked.php'">Liked</button>
+      <button class="btn" onclick="location.href='myPoints.php'">My Points</button>
+      <button class="btn" onclick="logout()">Logout</button>
+    </div>
 
     <button class="openbtn" onclick="openNav()">☰</button>
 
-<div id="mySidebar" class="sidebar">
+    <div id="mySidebar" class="sidebar">
       <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
       <a href="index.php">Home</a>
       <a href="discover.php">Discover</a>
@@ -205,29 +215,35 @@ display: none; /* Hide the open button initially */
     </div>
 
     <div class="container">
-    <h1>My Points</h1>
-    <div class="points-container">
+      <h1>My Points</h1>
+      <div class="points-container">
         <?php for ($i = 1; $i <= 10; $i++): ?>
-            <div class="point <?php echo ($i <= $points) ? 'filled' : ''; ?>"></div>
+          <div class="point <?php echo ($i <= $points) ? 'filled' : ''; ?>"></div>
         <?php endfor; ?>
+      </div>
+      <?php if ($points >= 10): ?>
+        <form method="post">
+          <button type="submit" name="redeem">Redeem</button>
+        </form>
+      <?php endif; ?>
     </div>
-</div>
+
     <script>
         function logout() {
             location.href = "logout.php";
         }
 
         function openNav() {
-        document.getElementById("mySidebar").style.left = "0";
-      }
+            document.getElementById("mySidebar").style.left = "0";
+        }
 
-      function closeNav() {
-        document.getElementById("mySidebar").style.left = "-250px";
-      }
+        function closeNav() {
+            document.getElementById("mySidebar").style.left = "-250px";
+        }
     </script>
-        <footer class="footer">
+
+    <footer class="footer">
         © All rights reserved
     </footer>
-
 </body>
 </html>
