@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $location = $_POST['location'];
     $features = $_POST['features'];
     $open_hours = $_POST['open_hours'];
+    $category = $_POST['category']; // Get the category from the form
     $userId = $_SESSION['user_id'];
 
     $logo = $_FILES['logo']['name'];
@@ -31,9 +32,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     // Ensure the logo path is correctly stored
     $logoPath = $target_file ? $target_file : null;
-    $sql = "INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, logo, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("issssssss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $logoPath);
+    $stmt->bind_param("isssssssss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $logoPath, $category);
 
     if ($stmt->execute()) {
         $restaurantId = $stmt->insert_id;

@@ -59,6 +59,24 @@ if ($result->num_rows > 0) {
         $restaurants[] = $row;
     }
 }
+
+$selectedCategory = isset($_GET['category']) ? $_GET['category'] : '';
+
+if ($selectedCategory !== '') {
+    $sql .= $selectedLocation !== 'All' ? " AND category = ?" : " WHERE category = ?";
+    $stmt = $conn->prepare($sql);
+    if ($selectedLocation !== 'All') {
+        $stmt->bind_param("ss", $selectedLocation, $selectedCategory);
+    } else {
+        $stmt->bind_param("s", $selectedCategory);
+    }
+} else {
+    $stmt = $conn->prepare($sql);
+    if ($selectedLocation !== 'All') {
+        $stmt->bind_param("s", $selectedLocation);
+    }
+}
+
 ?>
 
 
@@ -194,6 +212,7 @@ if ($result->num_rows > 0) {
 <div class="button-container">
     <button class="btn" onclick="location.href='index.php'">Home</button>
     <button class="btn" onclick="location.href='discover.php'">Discover</button>
+    <button class="btn" onclick="location.href='explore.php'">Explore</button>
     <button class="btn" onclick="location.href='liked.php'">Liked</button>
     <button class="btn" onclick="location.href='myPoints.php'">My Points</button>
     <button class="btn" onclick="logout()">Logout</button>
@@ -212,6 +231,7 @@ if ($result->num_rows > 0) {
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
         <a href="index.php">Home</a>
         <a href="discover.php">Discover</a>
+        <a href="explore.php">Explore</a>
         <a href="liked.php">Liked</a>
         <a href="myPoints.php">My Points</a>
         <a href="javascript:logout()">Logout</a>
