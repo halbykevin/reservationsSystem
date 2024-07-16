@@ -12,6 +12,7 @@ if ($addressResult->num_rows > 0) {
 }
 
 $selectedLocation = isset($_GET['location']) ? $_GET['location'] : 'All';
+$sortOrder = isset($_GET['sort']) && $_GET['sort'] == 'rating' ? 'rating' : 'default';
 
 $sql = "SELECT restaurants.*, IFNULL(AVG(ratings.rating), 0) AS avg_rating, COUNT(ratings.id) AS num_ratings
         FROM restaurants
@@ -23,6 +24,10 @@ if ($selectedLocation !== 'All') {
 
 $sql .= " GROUP BY restaurants.id";
 
+if ($sortOrder == 'rating') {
+    $sql .= " ORDER BY avg_rating DESC";
+}
+
 $stmt = $conn->prepare($sql);
 
 if ($selectedLocation !== 'All') {
@@ -31,6 +36,7 @@ if ($selectedLocation !== 'All') {
 
 $stmt->execute();
 $result = $stmt->get_result();
+
 
 if (!$result) {
     die("Database query failed: " . $conn->error);
@@ -129,6 +135,56 @@ if ($result->num_rows > 0) {
         width: 150px;
         height: auto;
       }
+
+      .sort-container {
+    text-align: center;
+    margin-top: 10px;
+}
+
+.sort-container button {
+    background-color: white;
+    color: black;
+    padding: 10px 20px;
+    border: 2px solid black;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sort-container button:hover {
+    background-color: #f1f1f1;
+    transform: translateY(-2px);
+}
+
+.sort-dropdown {
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+.sort-dropdown a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s;
+}
+
+.sort-dropdown a:hover {
+    background-color: #ddd;
+}
+
+.sort-dropdown.show {
+    display: block;
+}
+
+
     </style>
 </head>
 <body>
@@ -171,10 +227,44 @@ if ($result->num_rows > 0) {
         </select>
     </div>
 
+    <div class="sort-container">
+    <button onclick="toggleSortDropdown()">Sort by</button>
+    <div id="sortDropdown" class="sort-dropdown">
+        <a href="#" onclick="sortRestaurants('default')">Default</a>
+        <a href="#" onclick="sortRestaurants('rating')">Rating</a>
+    </div>
+</div>
+
+<script>
+function toggleSortDropdown() {
+    document.getElementById("sortDropdown").classList.toggle("show");
+}
+
+function sortRestaurants(order) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('sort', order);
+    window.location.href = url.href;
+}
+
+// Close the dropdown if the user clicks outside of it
+window.onclick = function(event) {
+    if (!event.target.matches('.sort-container button')) {
+        var dropdowns = document.getElementsByClassName("sort-dropdown");
+        for (var i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+                openDropdown.classList.remove('show');
+            }
+        }
+    }
+}
+</script>
+
+
 
 <div class="container" id="restaurantContainer">
     <?php foreach ($restaurants as $restaurant): ?>
-    <div class="restaurant-box" data-name="<?php echo strtolower($restaurant['name']); ?>" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
+        <div class="restaurant-box" data-name="<?php echo strtolower($restaurant['name']); ?>" data-features="<?php echo strtolower($restaurant['features']); ?>" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
         <div class="image-container">
         <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
         <div class="overlay">
@@ -326,13 +416,15 @@ function filterRestaurants() {
     let restaurantBoxes = document.querySelectorAll('.restaurant-box');
     restaurantBoxes.forEach(box => {
         let name = box.getAttribute('data-name');
-        if (name.includes(input)) {
+        let features = box.getAttribute('data-features');
+        if (name.includes(input) || features.includes(input)) {
             box.style.display = "block";
         } else {
             box.style.display = "none";
         }
     });
 }
+
 
 function likeRestaurant(restaurantId) {
     fetch('likeRestaurant.php', {
