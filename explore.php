@@ -88,6 +88,7 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="stylesDiscover.css">
     <link rel="stylesheet" href="stylesDiscover2.css">
     <link rel="stylesheet" href="stylesDiscover3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .footer {
             background-color: red;
@@ -160,36 +161,46 @@ if ($result->num_rows > 0) {
         }
 
         .categories-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px;
-        }
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch; /* Enables smooth scrolling on mobile */
+    justify-content: center;
+}
 
-        .category-box {
-            width: 200px;
-            height: 200px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s, opacity 0.3s;
-        }
-        .category-box.active {
-            opacity: 0.5;
-        }
-        .category-box.inactive {
-            transform: scale(0.8);
-        }
-        .category-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        .category-box:hover {
-            transform: translateY(-5px);
-        }
+@media (max-width: 768px) {
+    .categories-container {
+        justify-content: flex-start; /* Align to the left on mobile for scrolling */
+    }
+}
+
+
+.category-box {
+    width: 100px; /* Smaller width */
+    height: 100px; /* Smaller height */
+    flex: 0 0 auto; /* Prevents shrinking */
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s, opacity 0.3s;
+}
+.category-box.active {
+    opacity: 0.5;
+}
+.category-box.inactive {
+    transform: scale(0.8);
+}
+.category-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.category-box:hover {
+    transform: translateY(-5px);
+}
         .category-overlay {
             position: absolute;
             bottom: 0;
@@ -203,27 +214,29 @@ if ($result->num_rows > 0) {
         }
 
         .restaurant-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
-            margin: 20px;
-        }
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px;
+}
 
-        .restaurant-box {
-            width: 200px;
-            height: 200px;
-            position: relative;
-            overflow: hidden;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
+.restaurant-box {
+    width: 100%;
+    max-width: 200px; /* Smaller max width for landscape format */
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column; /* Ensure details are below the image */
+}
 
-        .restaurant-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.restaurant-box img {
+    width: 100%; /* Make the image take the full width */
+    height: auto; /* Maintain aspect ratio */
+}
 
         .restaurant-overlay {
             position: absolute;
@@ -236,6 +249,39 @@ if ($result->num_rows > 0) {
             text-align: center;
             font-size: 18px;
         }
+
+        .restaurant-details {
+    padding: 10px;
+    background: #f9f9f9;
+    border-top: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between; /* Align details next to each other */
+    align-items: center;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    font-size: 11px; /* Set font size to 11px */
+}
+
+.restaurant-name {
+    font-size: 11px; /* Set font size to 11px */
+    font-weight: normal; /* Lighter font weight */
+    margin-bottom: 0; /* Remove bottom margin */
+}
+
+.restaurant-info {
+    display: flex;
+    align-items: center;
+    font-size: 11px; /* Set font size to 11px */
+    font-weight: normal; /* Lighter font weight */
+    margin-top: 0; /* Remove top margin */
+}
+
+.restaurant-info img {
+    width: 12px; /* Smaller icon size */
+    height: 12px; /* Smaller icon size */
+    margin-right: 5px;
+}
+
+
     </style>
 </head>
 <body>
@@ -316,25 +362,36 @@ if ($result->num_rows > 0) {
         <div class="category-box">
             <a href="explore.php?category=<?php echo urlencode($category['name']); ?>">
                 <img src="<?php echo htmlspecialchars($category['image_path']); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>">
-                <div class="category-overlay"><?php echo htmlspecialchars($category['name']); ?></div>
+                <!-- Remove the overlay div content -->
             </a>
         </div>
     <?php endforeach; ?>
 </div>
+
 
 <div class="restaurant-container">
     <?php if (!empty($restaurants)): ?>
         <?php foreach ($restaurants as $restaurant): ?>
             <div class="restaurant-box">
                 <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
-                <div class="restaurant-overlay"><?php echo htmlspecialchars($restaurant['name']); ?></div>
+                <div class="restaurant-details">
+                    <div class="restaurant-name"><?php echo htmlspecialchars($restaurant['name']); ?></div>
+                    <div class="restaurant-info">
+                        <img src="uploads/pin.png" alt="Location">
+                        <?php echo htmlspecialchars($restaurant['address']); ?>
+                    </div>
+                    <div class="restaurant-info">
+                        (<?php echo htmlspecialchars($restaurant['num_ratings']); ?>)
+                        <?php echo number_format($restaurant['avg_rating'], 1); ?>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
             </div>
         <?php endforeach; ?>
     <?php else: ?>
         <p>No restaurants found for this category.</p>
     <?php endif; ?>
 </div>
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
