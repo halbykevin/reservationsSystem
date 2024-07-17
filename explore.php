@@ -372,7 +372,7 @@ if ($result->num_rows > 0) {
 <div class="restaurant-container">
     <?php if (!empty($restaurants)): ?>
         <?php foreach ($restaurants as $restaurant): ?>
-            <div class="restaurant-box">
+            <div class="restaurant-box" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
                 <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
                 <div class="restaurant-details">
                     <div class="restaurant-name"><?php echo htmlspecialchars($restaurant['name']); ?></div>
@@ -392,6 +392,224 @@ if ($result->num_rows > 0) {
         <p>No restaurants found for this category.</p>
     <?php endif; ?>
 </div>
+
+<!-- Modal Structure -->
+<?php foreach ($restaurants as $restaurant): ?>
+    <div id="restaurant<?php echo $restaurant['id']; ?>" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('restaurant<?php echo $restaurant['id']; ?>')">X</span>
+            <div class="main-image-frame">
+                <img src="<?php echo $restaurant['images'][0]; ?>" class="main-image" id="mainImage<?php echo $restaurant['id']; ?>" alt="<?php echo $restaurant['name']; ?>">
+            </div>
+            <div class="thumbnail-container">
+                <?php foreach ($restaurant['images'] as $index => $imagePath): ?>
+                    <img src="<?php echo $imagePath; ?>" class="thumbnail" alt="<?php echo $restaurant['name']; ?>" onclick="currentSlide(<?php echo $index; ?>, '<?php echo $restaurant['id']; ?>')">
+                <?php endforeach; ?>
+            </div>
+            <div class="bio-frame">
+                <p class="bio"><?php echo $restaurant['bio']; ?></p>
+            </div>
+
+            <!-- Display features -->
+            <div class="features">
+                <?php 
+                $features = explode(',', $restaurant['features']); 
+                foreach ($features as $feature) {
+                    echo "<span class='feature-bubble'>" . htmlspecialchars(trim($feature)) . "</span>";
+                }
+                ?>
+            </div>
+
+            <!-- Display open hours -->
+            <div class="open-hours">
+                <h3>Open Hours</h3>
+                <?php 
+                $open_hours = explode("\n", $restaurant['open_hours']);
+                foreach ($open_hours as $hours) {
+                    echo "<p>" . htmlspecialchars(trim($hours)) . "</p>";
+                }
+                ?>
+            </div>
+
+            <iframe
+                src="<?php echo htmlspecialchars($restaurant['location']); ?>"
+                width="50%"
+                height="600"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy">
+            </iframe>
+            <p><a href="<?php echo htmlspecialchars($restaurant['location']); ?>" target="_blank">View on Google Maps</a></p>
+            <button onclick="location.href='reserveForm.html?restaurantId=<?php echo $restaurant['id']; ?>'">Reserve Now</button>
+            <span class="heart-button" onclick="likeRestaurant(<?php echo $restaurant['id']; ?>)">❤</span>
+            <div class="rating-container">
+                <div class="stars" data-restaurant-id="<?php echo $restaurant['id']; ?>">
+                    <?php for ($i = 1; $i <= 5; $i++): ?>
+                        <span class="star <?php echo $i <= round($restaurant['avg_rating']) ? '' : 'empty'; ?>" onclick="rateRestaurant(<?php echo $restaurant['id']; ?>, <?php echo $i; ?>)">★</span>
+                    <?php endfor; ?>
+                </div>
+                <div class="num-ratings">(<?php echo $restaurant['num_ratings']; ?>)</div>
+                <button class="submit-rating" id="submit-rating-<?php echo $restaurant['id']; ?>" onclick="submitRating(<?php echo $restaurant['id']; ?>)">Submit Rating</button>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
+
+<script>
+    // Declare currentRating once at the top level
+    let currentRating = {};
+    let slideTimers = {}; // Store timers for each restaurant
+    let slideIndices = {}; // Store slide indices for each restaurant
+
+    function openModal(id) {
+        document.getElementById(id).style.display = "block";
+        const restaurantId = id.replace('restaurant', '');
+        slideIndices[restaurantId] = 0;
+        showSlides(restaurantId);
+    }
+
+    function closeModal(id) {
+        document.getElementById(id).style.display = "none";
+        const restaurantId = id.replace('restaurant', '');
+        clearTimeout(slideTimers[restaurantId]); // Stop the slideshow when the modal is closed
+    }
+
+    function logout() {
+        location.href = "logout.php";
+    }
+
+    // Close the modal if the user clicks outside of the modal content
+    window.onclick = function (event) {
+        let modals = document.querySelectorAll(".modal");
+        modals.forEach((modal) => {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        });
+    };
+
+    function filterRestaurants() {
+        let input = document.getElementById('searchBar').value.toLowerCase();
+        let restaurantBoxes = document.querySelectorAll('.restaurant-box');
+        restaurantBoxes.forEach(box => {
+            let name = box.getAttribute('data-name');
+            let features = box.getAttribute('data-features');
+            if (name.includes(input) || features.includes(input)) {
+                box.style.display = "block";
+            } else {
+                box.style.display = "none";
+            }
+        });
+    }
+
+    function likeRestaurant(restaurantId) {
+        fetch('likeRestaurant.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ restaurantId: restaurantId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Restaurant liked!');
+            } else {
+                alert('Error liking restaurant.');
+            }
+        });
+    }
+
+    function rateRestaurant(restaurantId, rating) {
+        currentRating[restaurantId] = rating;
+        const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('empty');
+            } else {
+                star.classList.add('empty');
+            }
+        });
+        document.getElementById(`submit-rating-${restaurantId}`).style.display = "block";
+    }
+
+    function submitRating(restaurantId) {
+        const rating = currentRating[restaurantId];
+        fetch('rateRestaurant.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ restaurantId: restaurantId, rating: rating })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Thank you for your rating!');
+                location.reload(); // Reload the page to update the average rating
+            } else {
+                alert('Error rating restaurant.');
+            }
+        });
+    }
+
+    function openProfileModal() {
+        document.getElementById("profileModal").style.display = "block";
+    }
+
+    function closeProfileModal() {
+        document.getElementById("profileModal").style.display = "none";
+    }
+
+    function openResetPassword() {
+        document.getElementById("profileModal").style.display = "none";
+        document.getElementById("resetPasswordModal").style.display = "block";
+    }
+
+    function closeResetPasswordModal() {
+        document.getElementById("resetPasswordModal").style.display = "none";
+    }
+
+    function openNav() {
+        document.getElementById("mySidebar").style.left = "0";
+    }
+
+    function closeNav() {
+        document.getElementById("mySidebar").style.left = "-250px";
+    }
+
+    function filterByLocation() {
+        const selectedLocation = document.getElementById('locationDropdown').value;
+        const url = new URL(window.location.href);
+        url.searchParams.set('location', selectedLocation);
+        window.location.href = url.href;
+    }
+
+    function showSlides(restaurantId) {
+        const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+        thumbnails.forEach((thumbnail, index) => {
+            thumbnail.classList.remove('active');
+        });
+        slideIndices[restaurantId]++;
+        if (slideIndices[restaurantId] > thumbnails.length) {
+            slideIndices[restaurantId] = 1;
+        }
+        thumbnails[slideIndices[restaurantId] - 1].classList.add('active');
+        document.getElementById(`mainImage${restaurantId}`).src = thumbnails[slideIndices[restaurantId] - 1].src;
+        slideTimers[restaurantId] = setTimeout(() => showSlides(restaurantId), 2000); // Change image every 2 seconds
+    }
+
+    function currentSlide(index, restaurantId) {
+        clearTimeout(slideTimers[restaurantId]); // Stop the automatic slideshow
+        const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+        thumbnails.forEach((thumbnail, idx) => {
+            thumbnail.classList.remove('active');
+        });
+        thumbnails[index].classList.add('active');
+        document.getElementById(`mainImage${restaurantId}`).src = thumbnails[index].src;
+        slideIndices[restaurantId] = index + 1; // Update slide index
+    }
+</script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -429,8 +647,6 @@ if ($result->num_rows > 0) {
         });
     });
 });
-
-    let currentRating = {};
 
     function openModal(id) {
         document.getElementById(id).style.display = "block";
