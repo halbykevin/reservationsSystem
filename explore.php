@@ -323,13 +323,18 @@ if ($result->num_rows > 0) {
 </div>
 
 <div class="restaurant-container">
-    <?php foreach ($restaurants as $restaurant): ?>
-        <div class="restaurant-box">
-            <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
-            <div class="restaurant-overlay"><?php echo htmlspecialchars($restaurant['name']); ?></div>
-        </div>
-    <?php endforeach; ?>
+    <?php if (!empty($restaurants)): ?>
+        <?php foreach ($restaurants as $restaurant): ?>
+            <div class="restaurant-box">
+                <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
+                <div class="restaurant-overlay"><?php echo htmlspecialchars($restaurant['name']); ?></div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+        <p>No restaurants found for this category.</p>
+    <?php endif; ?>
 </div>
+
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -367,7 +372,6 @@ if ($result->num_rows > 0) {
         });
     });
 });
-
 
     let currentRating = {};
 
