@@ -4,15 +4,49 @@ require 'db.php';
 
 $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
 
+// Fetch unique addresses for the dropdown
+$addressSql = "SELECT DISTINCT address FROM restaurants";
+$addressResult = $conn->query($addressSql);
+$addresses = [];
+if ($addressResult->num_rows > 0) {
+    while($row = $addressResult->fetch_assoc()) {
+        $addresses[] = $row['address'];
+    }
+}
+
+$selectedLocation = isset($_GET['location']) ? $_GET['location'] : 'All';
+$sortOrder = isset($_GET['sort']) && $_GET['sort'] == 'rating' ? 'rating' : 'default';
+
 // Fetch promotional restaurants
 $sql = "SELECT restaurants.*, IFNULL(AVG(ratings.rating), 0) AS avg_rating, COUNT(ratings.id) AS num_ratings
         FROM restaurants
-        LEFT JOIN ratings ON restaurants.id = ratings.restaurant_id
-        WHERE restaurants.is_promotional = 1
-        GROUP BY restaurants.id";
-$result = $conn->query($sql);
+        LEFT JOIN ratings ON restaurants.id = ratings.restaurant_id";
 
-$promotional_restaurants = [];
+if ($selectedLocation !== 'All') {
+    $sql .= " WHERE restaurants.address = ?";
+}
+
+$sql .= " GROUP BY restaurants.id";
+
+if ($sortOrder == 'rating') {
+    $sql .= " ORDER BY avg_rating DESC";
+}
+
+$stmt = $conn->prepare($sql);
+
+if ($selectedLocation !== 'All') {
+    $stmt->bind_param("s", $selectedLocation);
+}
+
+$stmt->execute();
+$result = $stmt->get_result();
+
+
+if (!$result) {
+    die("Database query failed: " . $conn->error);
+}
+
+$restaurants = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         $restaurantId = $row['id'];
@@ -26,7 +60,7 @@ if ($result->num_rows > 0) {
             $images[] = $imageRow['image_path'];
         }
         $row['images'] = $images;
-        $promotional_restaurants[] = $row;
+        $restaurants[] = $row;
     }
 }
 ?>
@@ -38,19 +72,21 @@ if ($result->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
     <link rel="stylesheet" href="stylesIndex.css" />
+    <link rel="stylesheet" href="mainStyles.css" />
+    <link rel="stylesheet" href="stylesDiscover2.css" />
     <style>
 
     /* Ensure modal covers the entire page */
-.modal {
-    display: none; /* Hidden by default */
-    position: fixed; /* Stay in place */
-    z-index: 1; /* Sit on top */
-    left: 0;
-    top: 0;
-    width: 100%; /* Full width */
-    height: 100%; /* Full height */
-    overflow: auto; /* Enable scroll if needed */
-    background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+    .modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.4);
 }
 
 .modal-content {
@@ -67,17 +103,20 @@ if ($result->num_rows > 0) {
 }
 
 .close {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
+  position: absolute;
+  right: 70px; /* Adjust this value to move the close button closer to the right */
+  top: 10px;
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 
@@ -139,196 +178,6 @@ if ($result->num_rows > 0) {
             opacity: 1;
         }
 
-        header,
-        body {
-            background-color: white;
-        }
-        .profile-icon {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-        }
-        .profile-modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.4);
-            padding-top: 60px;
-        }
-        .profile-modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 90%;
-            max-width: 600px;
-            border-radius: 10px;
-        }
-        .close-profile-modal {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close-profile-modal:hover,
-        .close-profile-modal:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-        }
-        .form-group button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .form-group button:hover {
-            background-color: #0056b3;
-        }
-        .button-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            background-color: #fff;
-            padding: 10px 0;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            width: 100%;
-        }
-        .button-container .btn {
-            font-size: 17px;
-            background: transparent;
-            border: none;
-            padding: 1em 1.5em;
-            color: black;
-            text-transform: uppercase;
-            position: relative;
-            transition: 0.5s ease;
-            cursor: pointer;
-        }
-        .button-container .btn::before {
-            content: "";
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            height: 2px;
-            width: 0;
-            background-color: black;
-            transition: 0.5s ease;
-        }
-        .button-container .btn:hover {
-            color: #1e1e2b;
-            transition-delay: 0.5s;
-        }
-        .button-container .btn:hover::before {
-            width: 100%;
-        }
-        .button-container .btn::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            height: 0;
-            width: 100%;
-            background-color: #ffc506;
-            transition: 0.4s ease;
-            z-index: -1;
-        }
-        .button-container .btn:hover::after {
-            height: 100%;
-            transition-delay: 0.4s;
-        }
-        .main-container {
-            flex: 1;
-            width: 100%;
-            max-width: 1200px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            background-color: #fff;
-            padding: 20px;
-            margin: 20px auto;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .sidebar {
-            height: 100%;
-            width: 250px;
-            position: fixed;
-            top: 0;
-            left: -250px;
-            background-color: #111;
-            overflow-x: hidden;
-            transition: 0.5s;
-            padding-top: 60px;
-            z-index: 1;
-        }
-        .sidebar a {
-            padding: 10px 15px;
-            text-decoration: none;
-            font-size: 18px;
-            color: white;
-            display: block;
-            transition: 0.3s;
-        }
-        .sidebar a:hover {
-            background-color: #575757;
-        }
-        .sidebar .closebtn {
-            position: absolute;
-            top: 10px;
-            right: 25px;
-            font-size: 36px;
-        }
-        .openbtn {
-            background-color: transparent;
-            font-size: 20px;
-            cursor: pointer;
-            color: black;
-            padding: 10px 15px;
-            border: none;
-            position: fixed;
-            top: 10px;
-            left: 10px;
-            z-index: 1;
-            display: none;
-        }
-        @media screen and (max-width: 768px) {
-            .button-container {
-                display: none;
-            }
-            .openbtn {
-                display: block;
-            }
-        }
         .slideshow-container {
             max-width: 600px;
             position: relative;
@@ -520,6 +369,11 @@ button.reserve-now {
     color: red; /* Fill color when liked */
 }
 
+@media screen and (max-width: 768px) {
+    .search-container {
+        margin-top: 50px; /* Adjust this value as needed */
+    }
+}
     </style>
 </head>
 <body>
@@ -597,16 +451,25 @@ button.reserve-now {
         <p class="small-text">Let's reserve a table for you</p>
     </div>
 
-    <div class="recommended-container">
+    
+    <div class="search-container">
+    <input type="text" id="searchBar" onkeyup="filterRestaurants()" placeholder="Search for restaurants...">
+</div>
+
+
+
+    <div id="recommendedContainer">
+    <div class="recommended-container" id="recommendedSection">
         <h2>Recommended for you</h2>
         <div class="container">
-            <?php foreach ($promotional_restaurants as $restaurant): ?>
-            <div class="restaurant-box-landscape" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
+            <?php foreach ($restaurants as $restaurant): ?>
+            <div class="restaurant-box-landscape" data-name="<?php echo strtolower($restaurant['name']); ?>" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
                 <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
                 <div class="overlay">
                     <span class="restaurant-name"><?php echo $restaurant['name']; ?></span>
                 </div>
             </div>
+        </div>
 
             <div id="restaurant<?php echo $restaurant['id']; ?>" class="modal" style="display: none;">
                 <div class="modal-content">
@@ -669,6 +532,12 @@ button.reserve-now {
             <?php endforeach; ?>
         </div>
     </div>
+    <div id="searchResultsContainer" class="recommended-container" style="display: none;">
+    <div class="container">
+        <!-- Search results will be injected here dynamically -->
+    </div>
+</div>
+
 
     <script>
         function openProfileModal() {
@@ -701,12 +570,12 @@ button.reserve-now {
         }
 
         function openModal(id) {
-    document.getElementById(id).style.display = "block";
-    const restaurantId = id.replace('restaurant', '');
-    slideIndices[restaurantId] = 0;
-    showSlides(restaurantId);
-    document.querySelector(`#${id} .reserve-now`).style.display = "block"; // Show Reserve Now button
-}
+            document.getElementById(id).style.display = "block";
+            const restaurantId = id.replace('restaurant', '');
+            slideIndices[restaurantId] = 0;
+            showSlides(restaurantId);
+            document.querySelector(`#${id} .reserve-now`).style.display = "block"; // Show Reserve Now button
+        }
 
         function closeModal(id) {
             document.getElementById(id).style.display = "none";
@@ -742,61 +611,93 @@ button.reserve-now {
             document.getElementById(`mainImage${restaurantId}`).src = thumbnails[index].src;
             slideIndices[restaurantId] = index + 1; // Update slide index
         }
-
+        
         function filterRestaurants() {
-            let input = document.getElementById('searchBar').value.toLowerCase();
-            let restaurantBoxes = document.querySelectorAll('.restaurant-box');
-            restaurantBoxes.forEach(box => {
-                let name = box.getAttribute('data-name');
-                if (name.includes(input)) {
-                    box.style.display = "block";
+    let input = document.getElementById('searchBar').value.toLowerCase();
+    let restaurantBoxes = document.querySelectorAll('.restaurant-box-landscape');
+    let searchResultsContainer = document.getElementById('searchResultsContainer');
+    let searchResultsContainerInner = searchResultsContainer.querySelector('.container');
+    searchResultsContainerInner.innerHTML = ''; // Clear previous search results
+    let found = false;
+
+    if (input === "") {
+        document.getElementById('recommendedContainer').style.display = 'block';
+        searchResultsContainer.style.display = 'none';
+        return;
+    }
+
+    let addedRestaurants = new Set();
+
+    restaurantBoxes.forEach(box => {
+        let name = box.getAttribute('data-name');
+        if (name.includes(input) && !addedRestaurants.has(name)) {
+            let clone = box.cloneNode(true); // Clone the restaurant box
+            searchResultsContainerInner.appendChild(clone); // Add clone to search results
+            addedRestaurants.add(name); // Add name to the set
+            found = true;
+        }
+    });
+
+    if (found) {
+        document.getElementById('recommendedContainer').style.display = 'none';
+        searchResultsContainer.style.display = 'block';
+    } else {
+        document.getElementById('recommendedContainer').style.display = 'block';
+        searchResultsContainer.style.display = 'none';
+    }
+}
+
+document.addEventListener('click', function(event) {
+    let searchBar = document.getElementById('searchBar');
+    let searchResultsContainer = document.getElementById('searchResultsContainer');
+    let recommendedContainer = document.getElementById('recommendedContainer');
+    
+    if (!searchBar.contains(event.target) && event.target !== searchBar) {
+        searchResultsContainer.style.display = 'none';
+        recommendedContainer.style.display = 'block';
+    }
+});
+
+document.getElementById('searchBar').addEventListener('input', function() {
+    if (this.value === '') {
+        document.getElementById('recommendedContainer').style.display = 'block';
+        document.getElementById('searchResultsContainer').style.display = 'none';
+    }
+});
+
+
+
+        function likeRestaurant(restaurantId) {
+            fetch('likeRestaurant.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ restaurantId: restaurantId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Restaurant liked!');
+                    document.querySelector(`#restaurant${restaurantId} .heart-button`).classList.toggle('liked');
                 } else {
-                    box.style.display = "none";
+                    alert('Error liking restaurant.');
                 }
             });
         }
 
-        function filterByLocation() {
-            const selectedLocation = document.getElementById('locationDropdown').value;
-            const url = new URL(window.location.href);
-            url.searchParams.set('location', selectedLocation);
-            window.location.href = url.href;
-        }
-
-        function likeRestaurant(restaurantId) {
-    fetch('likeRestaurant.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ restaurantId: restaurantId })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Restaurant liked!');
-            document.querySelector(`#restaurant${restaurantId} .heart-button`).classList.toggle('liked');
-        } else {
-            alert('Error liking restaurant.');
-        }
-    });
-}
-
-
-
-
         function rateRestaurant(restaurantId, rating) {
-    currentRating[restaurantId] = rating;
-    const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
-    stars.forEach((star, index) => {
-        if (index < rating) {
-            star.classList.remove('empty');
-        } else {
-            star.classList.add('empty');
+            currentRating[restaurantId] = rating;
+            const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
+            stars.forEach((star, index) => {
+                if (index < rating) {
+                    star.classList.remove('empty');
+                } else {
+                    star.classList.add('empty');
+                }
+            });
+            document.getElementById(`submit-rating-${restaurantId}`).style.display = "block"; // Show Submit Rating button
         }
-    });
-    document.getElementById(`submit-rating-${restaurantId}`).style.display = "block"; // Show Submit Rating button
-}
 
         function submitRating(restaurantId) {
             const rating = currentRating[restaurantId];
@@ -817,20 +718,20 @@ button.reserve-now {
                 }
             });
         }
-        function showSlides(restaurantId) {
-    const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
-    thumbnails.forEach((thumbnail, index) => {
-        thumbnail.classList.remove('active');
-    });
-    slideIndices[restaurantId]++;
-    if (slideIndices[restaurantId] > thumbnails.length) {
-        slideIndices[restaurantId] = 1;
-    }
-    thumbnails[slideIndices[restaurantId] - 1].classList.add('active');
-    document.getElementById(`mainImage${restaurantId}`).src = thumbnails[slideIndices[restaurantId] - 1].src;
-    slideTimers[restaurantId] = setTimeout(() => showSlides(restaurantId), 1000); // Change image every 1 second
-}
 
+        function showSlides(restaurantId) {
+            const thumbnails = document.querySelectorAll(`#restaurant${restaurantId} .thumbnail`);
+            thumbnails.forEach((thumbnail, index) => {
+                thumbnail.classList.remove('active');
+            });
+            slideIndices[restaurantId]++;
+            if (slideIndices[restaurantId] > thumbnails.length) {
+                slideIndices[restaurantId] = 1;
+            }
+            thumbnails[slideIndices[restaurantId] - 1].classList.add('active');
+            document.getElementById(`mainImage${restaurantId}`).src = thumbnails[slideIndices[restaurantId] - 1].src;
+            slideTimers[restaurantId] = setTimeout(() => showSlides(restaurantId), 1000); // Change image every 1 second
+        }
     </script>
     <footer class="footer">
         © All rights reserved
