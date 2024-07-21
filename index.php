@@ -273,12 +273,15 @@ if ($result->num_rows > 0) {
         top: 80px; /* Adjust the top value as needed */
     }
     .recommended-container {
-        top: 170px; /* Adjust the top value as needed */
+        top: 220px; /* Adjust the top value as needed */
+    }
+    .recommended-container h2{
+        font-size: 20px;
     }
 }
 
 
-        .main-image-frame {
+.main-image-frame {
     width: 100%;
     display: flex;
     justify-content: center;
@@ -371,8 +374,11 @@ button.reserve-now {
 
 @media screen and (max-width: 768px) {
     .search-container {
-        margin-top: 50px; /* Adjust this value as needed */
+        margin-top: 70px; /* Adjust this value as needed */
+        justify-content: left;
+        margin-left: 80px;
     }
+    
 }
     </style>
 </head>
