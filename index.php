@@ -76,6 +76,29 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="stylesDiscover2.css" />
     <style>
 
+.button-container {
+    background-color: white;
+}
+
+.button-container .btn {
+    color: black;
+    background-color:white; 
+}
+
+.button-container .btn:hover {
+    color: black;
+    background-color: white;
+}
+
+body {
+    background-color: white; /* Off-white color */
+}
+
+header {
+    background-color: zwhite; /* Off-white color */
+}
+
+
     /* Ensure modal covers the entire page */
     .modal {
   display: none;
