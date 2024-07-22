@@ -4,6 +4,20 @@ require 'db.php';
 
 $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
 
+// Fetch user notifications
+$userId = $_SESSION['user_id'];
+$notificationSql = "SELECT reservations.*, restaurants.name AS restaurant_name FROM reservations JOIN restaurants ON reservations.restaurant_id = restaurants.id WHERE reservations.user_id = ?";
+$notificationStmt = $conn->prepare($notificationSql);
+$notificationStmt->bind_param("i", $userId);
+$notificationStmt->execute();
+$notificationResult = $notificationStmt->get_result();
+$notifications = [];
+if ($notificationResult->num_rows > 0) {
+    while ($row = $notificationResult->fetch_assoc()) {
+        $notifications[] = $row;
+    }
+}
+
 // Fetch unique addresses for the dropdown
 $addressSql = "SELECT DISTINCT address FROM restaurants";
 $addressResult = $conn->query($addressSql);
@@ -13,6 +27,19 @@ if ($addressResult->num_rows > 0) {
         $addresses[] = $row['address'];
     }
 }
+
+$sql = "SELECT reservations.*, restaurants.name AS restaurant_name FROM reservations JOIN restaurants ON reservations.restaurant_id = restaurants.id WHERE reservations.user_id = ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $userId);
+$stmt->execute();
+$result = $stmt->get_result();
+$reservations = [];
+if ($result->num_rows > 0) {
+    while ($row = $result->fetch_assoc()) {
+        $reservations[] = $row;
+    }
+}
+
 
 $selectedLocation = isset($_GET['location']) ? $_GET['location'] : 'All';
 $sortOrder = isset($_GET['sort']) && $_GET['sort'] == 'rating' ? 'rating' : 'default';
@@ -76,8 +103,69 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="stylesDiscover2.css" />
     <style>
 
+.notification-icon {
+    margin-left: 10px; /* Adds some margin to the left of the icon */
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+}
+
+.notification-modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.notification-modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+    overflow: auto;
+}
+
+.notification-close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.notification-close:hover,
+.notification-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.notification-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
+
 .button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers the buttons */
     background-color: white;
+    gap: 10px; /* Adjusts the space between buttons */
 }
 
 .button-container .btn {
@@ -415,9 +503,30 @@ button.reserve-now {
         <button class="btn" onclick="location.href='liked.php'">Liked</button>
         <button class="btn" onclick="location.href='myPoints.php'">My Points</button>
         <button class="btn" onclick="logout()">Logout</button>
+        <img src="uploads/noti.jpg" class="notification-icon" alt="Notification Icon" onclick="openNotificationModal()" />
     </div>
 
     <img src="images/icons/user-avatar.png" class="profile-icon" alt="Profile Icon" onclick="openProfileModal()" />
+
+    <div id="notificationModal" class="notification-modal">
+    <div class="notification-modal-content">
+        <span class="notification-close" onclick="closeNotificationModal()">&times;</span>
+        <h2>Notifications</h2>
+        <?php if (count($notifications) > 0): ?>
+            <?php foreach ($notifications as $notification): ?>
+                <div class="notification-item">
+                <p><strong>Restaurant:</strong> <?php echo htmlspecialchars($notification['restaurant_name']); ?></p>
+<p><strong>Status:</strong> <?php echo htmlspecialchars($notification['status']); ?></p>
+                    <?php if ($notification['status'] == 'declined'): ?>
+                        <p><strong>Reason:</strong> <?php echo htmlspecialchars($notification['decline_reason']); ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>No notifications.</p>
+        <?php endif; ?>
+    </div>
+</div>
 
     <button class="openbtn" onclick="openNav()">☰</button>
 
@@ -569,6 +678,23 @@ button.reserve-now {
 
 
     <script>
+
+function openNotificationModal() {
+    document.getElementById('notificationModal').style.display = 'block';
+}
+
+function closeNotificationModal() {
+    document.getElementById('notificationModal').style.display = 'none';
+}
+window.onclick = function(event) {
+    let modal = document.getElementById('notificationModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+};
+
+
+
         function openProfileModal() {
             document.getElementById("profileModal").style.display = "block";
         }
