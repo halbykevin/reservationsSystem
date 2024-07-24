@@ -91,14 +91,14 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .footer {
-            background-color: red;
-            color: white;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
-        }
+        background-color: grey;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+      }
 
         body {
             background-color: white;
@@ -143,7 +143,7 @@ if ($result->num_rows > 0) {
             bottom: 0;
             height: 0;
             width: 100%;
-            background-color: #ffc506;
+            background-color: black;
             transition: 0.4s ease;
             z-index: -1;
         }

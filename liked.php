@@ -25,15 +25,15 @@ if ($result->num_rows > 0) {
 </head>
 <body>
 <style>
-  .footer {
-    background-color: red;
-    color: white;
-    text-align: center;
-    padding: 10px 0;
-    position: fixed;
-    width: 100%;
-    bottom: 0;
-}
+.footer {
+        background-color: grey;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+      }
 
     header,
       body {
@@ -108,15 +108,7 @@ if ($result->num_rows > 0) {
         .form-group button:hover {
             background-color: #0056b3;
         }
-        .button-container {
-        display: flex;
-        justify-content: center; /* Center buttons horizontally */
-        gap: 10px; /* Space between buttons */
-        background-color: #fff;
-        padding: 10px 0;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        width: 100%;
-      }
+       
       .main-container {
         flex: 1;
         width: 100%;

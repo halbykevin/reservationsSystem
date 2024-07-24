@@ -31,6 +31,7 @@ $points = $user['points'];
 </head>
 <body>
     <style>
+
       .points-container {
         display: flex;
         gap: 5px;
@@ -50,7 +51,7 @@ $points = $user['points'];
       }
 
       .footer {
-        background-color: red;
+        background-color: grey;
         color: white;
         text-align: center;
         padding: 10px 0;
@@ -161,7 +162,7 @@ $points = $user['points'];
         bottom: 0;
         height: 2px;
         width: 0;
-        background-color: #ffc506;
+        background-color: black;
         transition: 0.5s ease;
       }
       .button-container .btn:hover {
