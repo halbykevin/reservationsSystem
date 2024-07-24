@@ -102,7 +102,29 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="mainStyles.css" />
     <link rel="stylesheet" href="stylesDiscover2.css" />
     <style>
+/* Your existing styles */
 
+@media screen and (max-width: 768px) {
+    .button-container {
+        display: none !important;
+    }
+    .openbtn {
+        display: block !important;
+    }
+}
+</style>
+
+    <style>
+        @media screen and (max-width: 768px) {
+            .button-container {
+                display: none;
+            }
+            .openbtn {
+                display: block;
+            }
+        }
+        
+    
 .notification-icon {
     margin-left: 10px; /* Adds some margin to the left of the icon */
     width: 30px;
@@ -528,17 +550,17 @@ button.reserve-now {
     </div>
 </div>
 
-    <button class="openbtn" onclick="openNav()">☰</button>
+<button class="openbtn" onclick="openNav()">☰</button>
 
-    <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-        <a href="index.php">Home</a>
-        <a href="discover.php">Discover</a>
-        <a href="explore.php">Explore</a>
-        <a href="liked.php">Liked</a>
-        <a href="myPoints.php">My Points</a>
-        <a href="javascript:logout()">Logout</a>
-    </div>
+<div id="mySidebar" class="sidebar">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
+    <a href="index.php">Home</a>
+    <a href="discover.php">Discover</a>
+    <a href="explore.php">Explore</a>
+    <a href="liked.php">Liked</a>
+    <a href="myPoints.php">My Points</a>
+    <a href="javascript:logout()">Logout</a>
+</div>
 
     <div id="profileModal" class="profile-modal">
         <div class="profile-modal-content">
@@ -713,7 +735,7 @@ window.onclick = function(event) {
         }
 
         function logout() {
-            location.href = "logout.php";
+            location.href = "login.php";
         }
 
         function openNav() {

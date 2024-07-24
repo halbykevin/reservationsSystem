@@ -186,14 +186,6 @@ body {
   z-index: 1;
   display: none;
 }
-@media screen and (max-width: 768px) {
-  .button-container {
-    display: none;
-  }
-  .openbtn {
-    display: block;
-  }
-}
 
 .restaurant-box {
   position: relative;
@@ -246,4 +238,13 @@ body {
 
 .restaurant-box:hover .overlay {
   opacity: 1;
+}
+
+@media screen and (max-width: 768px) {
+  .button-container {
+    display: none;
+  }
+  .openbtn {
+    display: block;
+  }
 }
