@@ -3,6 +3,7 @@ session_start();
 require 'db.php';
 
 $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : 'Guest';
+$is_logged_in = isset($_SESSION['user_id']);
 
 // Fetch user notifications
 $userId = $_SESSION['user_id'];
@@ -125,11 +126,24 @@ if ($result->num_rows > 0) {
         }
         
     
-.notification-icon {
-    margin-left: 10px; /* Adds some margin to the left of the icon */
+        .notification-icon {
     width: 30px;
     height: 30px;
     cursor: pointer;
+    margin-left: 0; /* Remove auto margin */
+}
+
+.greeting-container {
+    text-align: left;
+    margin: 20px 20px;
+    position: absolute;
+    top: 200px; /* Adjust the top value as needed */
+    left: 2px; /* Adjust the left value as needed */
+    width: calc(100% - 40px); /* Adjust width to ensure proper spacing */
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    align-items: flex-start; /* Align items to the start */
+    gap: 10px; /* Add space between elements */
 }
 
 .notification-modal {
@@ -374,14 +388,6 @@ header {
         bottom: 0;
       }
 
-        .greeting-container {
-            text-align: left;
-            margin: 20px 20px;
-            position: absolute;
-            top: 200px; /* Adjust the top value as needed */
-            left: 20px; /* Adjust the left value as needed */
-        }
-
         .greeting-container h1 {
             font-size: 24px;
             margin-bottom: 5px; /* Reduce the bottom margin */
@@ -397,15 +403,7 @@ header {
                 width: 100px; /* Smaller width for mobile */
             }
         }
-        @media screen and (max-width: 768px) {
-    .greeting-container {
-        top: 100px; /* Adjust the top value as needed */
-    }
-}
 @media screen and (max-width: 768px) {
-    .greeting-container {
-        top: 80px; /* Adjust the top value as needed */
-    }
     .recommended-container {
         top: 220px; /* Adjust the top value as needed */
     }
@@ -413,7 +411,20 @@ header {
         font-size: 20px;
     }
 }
+@media screen and (max-width: 768px) {
+    .greeting-container {
+        top: 80px; /* Adjust the top value as needed */
+        width: calc(100% - 40px); /* Adjust width to ensure proper spacing */
+        display: flex;
+        justify-content: space-between; /* Ensure the elements are spaced out */
+        align-items: center;
+    }
 
+    .notification-icon {
+        margin-left: auto; /* Align to the right */
+        order: 2; /* Ensure it comes after the greeting message */
+    }
+}
 
 .main-image-frame {
     width: 100%;
@@ -514,22 +525,48 @@ button.reserve-now {
     }
     
 }
+.profile-icon, .notification-icon {
+    display: block;
+    margin: 10px auto; /* Center icons horizontally and add margin */
+    position: absolute; /* Use absolute positioning */
+    right: 10px; /* Position 10px from the right */
+}
+
+.notification-icon {
+    top: 70px; /* Adjust the top margin as needed to position under the profile icon */
+}
+
     </style>
 </head>
 <body>
     <img src="uploads/logo.png" class="logo" alt="logo" />
 
     <div class="button-container">
-        <button class="btn" onclick="location.href='index.php'">Home</button>
-        <button class="btn" onclick="location.href='discover.php'">Discover</button>
-        <button class="btn" onclick="location.href='explore.php'">Explore</button>
-        <button class="btn" onclick="location.href='liked.php'">Liked</button>
-        <button class="btn" onclick="location.href='myPoints.php'">My Points</button>
+    <button class="btn" onclick="location.href='index.php'">Home</button>
+    <button class="btn" onclick="checkLogin('discover.php')">Discover</button>
+    <button class="btn" onclick="checkLogin('explore.php')">Explore</button>
+    <button class="btn" onclick="checkLogin('liked.php')">Liked</button>
+    <button class="btn" onclick="checkLogin('myPoints.php')">My Points</button>
+    <?php if ($is_logged_in): ?>
         <button class="btn" onclick="logout()">Logout</button>
-        <img src="uploads/noti.jpg" class="notification-icon" alt="Notification Icon" onclick="openNotificationModal()" />
-    </div>
+    <?php else: ?>
+        <button class="btn" onclick="location.href='login.php'">Login</button>
+        <button class="btn" onclick="location.href='register.html'">Register</button>
+    <?php endif; ?>
+</div>
+
+<script>
+   function checkLogin(page) {
+        <?php if ($is_logged_in): ?>
+            location.href = page;
+        <?php else: ?>
+            location.href = 'login.php';
+        <?php endif; ?>
+    }
+</script>
 
     <img src="images/icons/user-avatar.png" class="profile-icon" alt="Profile Icon" onclick="openProfileModal()" />
+    <img src="uploads/noti.jpg" class="notification-icon" alt="Notification Icon" onclick="openNotificationModal()" />
 
     <div id="notificationModal" class="notification-modal">
     <div class="notification-modal-content">
@@ -556,12 +593,18 @@ button.reserve-now {
 <div id="mySidebar" class="sidebar">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
     <a href="index.php">Home</a>
-    <a href="discover.php">Discover</a>
-    <a href="explore.php">Explore</a>
-    <a href="liked.php">Liked</a>
-    <a href="myPoints.php">My Points</a>
-    <a href="javascript:logout()">Logout</a>
+    <a href="javascript:void(0)" onclick="checkLogin('discover.php')">Discover</a>
+    <a href="javascript:void(0)" onclick="checkLogin('explore.php')">Explore</a>
+    <a href="javascript:void(0)" onclick="checkLogin('liked.php')">Liked</a>
+    <a href="javascript:void(0)" onclick="checkLogin('myPoints.php')">My Points</a>
+    <?php if ($is_logged_in): ?>
+        <a href="javascript:logout()">Logout</a>
+    <?php else: ?>
+        <a href="login.php">Login</a>
+        <a href="register.html">Register</a>
+    <?php endif; ?>
 </div>
+
 
     <div id="profileModal" class="profile-modal">
         <div class="profile-modal-content">
@@ -608,9 +651,12 @@ button.reserve-now {
     </div>
 
     <div class="greeting-container">
+    <div>
         <h1>Hello, <?php echo htmlspecialchars($user_name); ?></h1>
         <p class="small-text">Let's reserve a table for you</p>
     </div>
+</div>
+
 
     
     <div class="search-container">
@@ -677,7 +723,7 @@ button.reserve-now {
                         loading="lazy">
                     </iframe>
                     <p><a href="<?php echo htmlspecialchars($restaurant['location']); ?>" target="_blank">View on Google Maps</a></p>
-                    <button class="reserve-now" onclick="location.href='reserveForm.html?restaurantId=<?php echo $restaurant['id']; ?>'">Reserve Now</button>
+                    <button class="reserve-now" onclick="reserveRestaurant(<?php echo $restaurant['id']; ?>)">Reserve Now</button>
                     <span class="heart-button" onclick="likeRestaurant(<?php echo $restaurant['id']; ?>)"></span>
                     <div class="rating-container">
                         <div class="stars" data-restaurant-id="<?php echo $restaurant['id']; ?>">
@@ -715,9 +761,6 @@ window.onclick = function(event) {
         modal.style.display = "none";
     }
 };
-
-
-
         function openProfileModal() {
             document.getElementById("profileModal").style.display = "block";
         }
@@ -736,8 +779,13 @@ window.onclick = function(event) {
         }
 
         function logout() {
-            location.href = "login.php";
-        }
+    fetch('logout.php', {
+        method: 'POST'
+    }).then(() => {
+        location.href = "login.php";
+    });
+}
+
 
         function openNav() {
             document.getElementById("mySidebar").style.left = "0";
@@ -748,12 +796,16 @@ window.onclick = function(event) {
         }
 
         function openModal(id) {
-            document.getElementById(id).style.display = "block";
-            const restaurantId = id.replace('restaurant', '');
-            slideIndices[restaurantId] = 0;
-            showSlides(restaurantId);
-            document.querySelector(`#${id} .reserve-now`).style.display = "block"; // Show Reserve Now button
-        }
+    document.getElementById(id).style.display = "block";
+    const restaurantId = id.replace('restaurant', '');
+    slideIndices[restaurantId] = 0;
+    showSlides(restaurantId);
+    
+    <?php if ($is_logged_in): ?>
+        document.querySelector(`#${id} .reserve-now`).style.display = "block"; // Show Reserve Now button
+    <?php endif; ?>
+}
+
 
         function closeModal(id) {
             document.getElementById(id).style.display = "none";
@@ -845,37 +897,59 @@ document.getElementById('searchBar').addEventListener('input', function() {
 
 
 
-        function likeRestaurant(restaurantId) {
-            fetch('likeRestaurant.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ restaurantId: restaurantId })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Restaurant liked!');
-                    document.querySelector(`#restaurant${restaurantId} .heart-button`).classList.toggle('liked');
-                } else {
-                    alert('Error liking restaurant.');
-                }
-            });
+function likeRestaurant(restaurantId) {
+    <?php if (!$is_logged_in): ?>
+        location.href = 'login.php';
+        return;
+    <?php endif; ?>
+    
+    fetch('likeRestaurant.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ restaurantId: restaurantId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Restaurant liked!');
+            document.querySelector(`#restaurant${restaurantId} .heart-button`).classList.toggle('liked');
+        } else {
+            alert('Error liking restaurant.');
         }
+    });
+}
 
-        function rateRestaurant(restaurantId, rating) {
-            currentRating[restaurantId] = rating;
-            const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
-            stars.forEach((star, index) => {
-                if (index < rating) {
-                    star.classList.remove('empty');
-                } else {
-                    star.classList.add('empty');
-                }
-            });
-            document.getElementById(`submit-rating-${restaurantId}`).style.display = "block"; // Show Submit Rating button
+function reserveRestaurant(restaurantId) {
+    <?php if (!$is_logged_in): ?>
+        location.href = 'login.php';
+        return;
+    <?php endif; ?>
+    
+    location.href = `reserveForm.html?restaurantId=${restaurantId}`;
+}
+
+
+
+function rateRestaurant(restaurantId, rating) {
+    <?php if (!$is_logged_in): ?>
+        location.href = 'login.php';
+        return;
+    <?php endif; ?>
+    
+    currentRating[restaurantId] = rating;
+    const stars = document.querySelectorAll(`#restaurant${restaurantId} .star`);
+    stars.forEach((star, index) => {
+        if (index < rating) {
+            star.classList.remove('empty');
+        } else {
+            star.classList.add('empty');
         }
+    });
+    document.getElementById(`submit-rating-${restaurantId}`).style.display = "block"; // Show Submit Rating button
+}
+
 
         function submitRating(restaurantId) {
             const rating = currentRating[restaurantId];

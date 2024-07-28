@@ -1,5 +1,21 @@
 <?php
+session_start();
 require 'db.php';
+
+// Fetch user notifications
+$userId = $_SESSION['user_id'];
+$notificationSql = "SELECT reservations.*, restaurants.name AS restaurant_name FROM reservations JOIN restaurants ON reservations.restaurant_id = restaurants.id WHERE reservations.user_id = ?";
+$notificationStmt = $conn->prepare($notificationSql);
+$notificationStmt->bind_param("i", $userId);
+$notificationStmt->execute();
+$notificationResult = $notificationStmt->get_result();
+$notifications = [];
+if ($notificationResult->num_rows > 0) {
+    while ($row = $notificationResult->fetch_assoc()) {
+        $notifications[] = $row;
+    }
+}
+
 
 // Fetch categories from the categories table
 $categorySql = "SELECT * FROM categories";
@@ -90,6 +106,73 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="stylesDiscover3.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
+
+.profile-icon, .notification-icon {
+    display: block;
+    margin: 10px auto; /* Center icons horizontally and add margin */
+    position: absolute; /* Use absolute positioning */
+    right: 10px; /* Position 10px from the right */
+}
+
+.notification-icon {
+    top: 70px; /* Adjust the top margin as needed to position under the profile icon */
+}
+.notification-icon {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    margin-left: 0; /* Remove auto margin */
+}
+
+.notification-modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.notification-modal-content {
+    background-color: #fefefe;
+    margin: auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 10px;
+    overflow: auto;
+}
+
+.notification-close {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.notification-close:hover,
+.notification-close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.notification-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+}
+
+.notification-item:last-child {
+    border-bottom: none;
+}
+
         .footer {
         background-color: grey;
         color: white;
@@ -298,6 +381,44 @@ if ($result->num_rows > 0) {
 </div>
 
 <img src="images/icons/user-avatar.png" class="profile-icon" alt="Profile Icon" onclick="openProfileModal()" />
+<img src="uploads/noti.jpg" class="notification-icon" alt="Notification Icon" onclick="openNotificationModal()" />
+
+    <div id="notificationModal" class="notification-modal">
+    <div class="notification-modal-content">
+        <span class="notification-close" onclick="closeNotificationModal()">&times;</span>
+        <h2>Notifications</h2>
+        <?php if (count($notifications) > 0): ?>
+            <?php foreach ($notifications as $notification): ?>
+                <div class="notification-item">
+                <p><strong>Restaurant:</strong> <?php echo htmlspecialchars($notification['restaurant_name']); ?></p>
+<p><strong>Status:</strong> <?php echo htmlspecialchars($notification['status']); ?></p>
+                    <?php if ($notification['status'] == 'declined'): ?>
+                        <p><strong>Reason:</strong> <?php echo htmlspecialchars($notification['decline_reason']); ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p>No notifications.</p>
+        <?php endif; ?>
+    </div>
+</div>
+<script>
+function openNotificationModal() {
+    document.getElementById('notificationModal').style.display = 'block';
+}
+
+function closeNotificationModal() {
+    document.getElementById('notificationModal').style.display = 'none';
+}
+window.onclick = function(event) {
+    let modal = document.getElementById('notificationModal');
+    let modalContent = document.querySelector('.notification-modal-content');
+    if (event.target == modal && !modalContent.contains(event.target)) {
+        modal.style.display = "none";
+    }
+};
+
+</script>
 
 <button class="openbtn" onclick="openNav()">☰</button>
 
