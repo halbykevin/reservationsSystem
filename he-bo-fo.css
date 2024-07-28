@@ -1,0 +1,26 @@
+/*Footer styling*/
+.footer {
+  background-color: grey;
+  color: white;
+  text-align: center;
+  padding: 10px 0; /* Thinner padding */
+  width: 100%;
+  margin-top: auto; /* Pushes footer to the bottom */
+}
+
+/*Header and body*/
+header{
+  font-family: Arial, sans-serif;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  background-color: white;
+  margin: 0;
+  padding: 0;
+}

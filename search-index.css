@@ -1,0 +1,34 @@
+/* Search bar only for the index.php */
+
+@media screen and (max-width: 768px) {
+  .search-container {
+    margin-top: 300px; /* Lower the search bar further */
+    justify-content: flex-start; /* Align to the left */
+    padding-left: 20px; /* Align with the greeting container */
+    width: calc(100% - 40px); /* Adjust width to ensure proper spacing */
+    position: relative; /* Ensure it's not overlapped */
+    z-index: 1; /* Lower the z-index to ensure it's not in the front */
+  }
+
+  .search-container input {
+    width: 100%; /* Adjust width to ensure proper spacing */
+    z-index: 1; /* Lower the z-index to ensure it's not in the front */
+  }
+}
+
+.search-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  position: relative; /* Ensure it's not overlapped */
+  z-index: 1; /* Lower the z-index to ensure it's not in the front */
+}
+
+.search-container input {
+  width: 50%;
+  padding: 10px;
+  font-size: 16px;
+  position: relative; /* Ensure it's not overlapped */
+  z-index: 1; /* Lower the z-index to ensure it's not in the front */
+}

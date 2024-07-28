@@ -1,0 +1,103 @@
+/* Main buttons and side bar */
+
+/* Media query for small screens */
+@media screen and (max-width: 768px) {
+  .button-container {
+    display: none !important;
+  }
+  .openbtn {
+    display: block !important;
+  }
+}
+
+.button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Centers the buttons */
+  background-color: white;
+  gap: 10px; /* Adjusts the space between buttons */
+  padding: 10px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.button-container .btn {
+  font-size: 17px;
+  background: transparent;
+  border: none;
+  padding: 1em 1.5em;
+  color: black; /* Set button text color to black */
+  text-transform: uppercase;
+  position: relative;
+  transition: 0.5s ease;
+  cursor: pointer;
+}
+
+.button-container .btn::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 0;
+  background-color: black;
+  transition: 0.5s ease;
+}
+
+.button-container .btn:hover {
+  color: #1e1e2b;
+  transition-delay: 0.5s;
+}
+
+.button-container .btn:hover::before {
+  width: 100%;
+}
+
+/* SideBar */
+.sidebar {
+  height: 100%;
+  width: 250px;
+  position: fixed;
+  top: 0;
+  left: -250px;
+  background-color: #111;
+  overflow-x: hidden;
+  transition: 0.5s;
+  padding-top: 60px;
+  z-index: 1;
+}
+
+.sidebar a {
+  padding: 10px 15px;
+  text-decoration: none;
+  font-size: 18px;
+  color: white;
+  display: block;
+  transition: 0.3s;
+}
+
+.sidebar a:hover {
+  background-color: #575757;
+}
+
+.sidebar .closebtn {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  font-size: 36px;
+}
+
+/* Open button for the SideBar */
+.openbtn {
+  background-color: transparent;
+  font-size: 20px;
+  cursor: pointer;
+  color: black;
+  padding: 10px 15px;
+  border: none;
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1;
+  display: none;
+}

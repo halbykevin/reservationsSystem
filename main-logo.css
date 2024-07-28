@@ -1,0 +1,13 @@
+/*Main Logo*/
+
+.logo {
+  display: block;
+  margin: 20px auto;
+  width: 150px;
+  height: auto;
+}
+@media screen and (max-width: 768px) {
+  .logo {
+    width: 100px; /* Smaller width for mobile */
+  }
+}
