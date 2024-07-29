@@ -10,55 +10,35 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $location = $_POST['location'];
     $features = $_POST['features'];
     $open_hours = $_POST['open_hours'];
-    $category = $_POST['category']; // Get the category from the form
-    $userId = $_SESSION['user_id'];
+    $capacity = $_POST['capacity'];
+    $category = $_POST['category'];
+    $user_id = $_SESSION['user_id'];
 
-    $logo = $_FILES['logo']['name'];
-    $target_file = null;
-
-    if (!empty($logo)) {
-        $target_dir = "uploads/";
-
-        if (!is_dir($target_dir)) {
-            mkdir($target_dir, 0755, true);
-        }
-
-        $target_file = $target_dir . basename($logo);
-        if (!move_uploaded_file($_FILES['logo']['tmp_name'], $target_file)) {
-            echo "Error uploading file.";
-            exit();
-        }
+    // Handle file uploads for logo and images
+    $logo = $_FILES['logo'];
+    $logoPath = null;
+    if ($logo['error'] == 0) {
+        $logoPath = 'uploads/' . basename($logo['name']);
+        move_uploaded_file($logo['tmp_name'], $logoPath);
     }
 
-    // Ensure the logo path is correctly stored
-    $logoPath = $target_file ? $target_file : null;
-    $sql = "INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, logo, category) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("isssssssss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $logoPath, $category);
+    $stmt = $conn->prepare("INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, capacity, category, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    $stmt->bind_param("issssssisis", $user_id, $name, $bio, $address, $phone, $location, $features, $open_hours, $capacity, $category, $logoPath);
+    $stmt->execute();
+    $restaurant_id = $stmt->insert_id;
 
-    if ($stmt->execute()) {
-        $restaurantId = $stmt->insert_id;
+    // Handle multiple images upload
+    foreach ($_FILES['restaurant_images']['tmp_name'] as $key => $tmp_name) {
+        $file_name = $_FILES['restaurant_images']['name'][$key];
+        $file_tmp = $_FILES['restaurant_images']['tmp_name'][$key];
+        $file_path = 'uploads/' . basename($file_name);
+        move_uploaded_file($file_tmp, $file_path);
 
-        // Handle multiple images upload
-        $imageCount = count($_FILES['restaurant_images']['name']);
-        for ($i = 0; $i < $imageCount; $i++) {
-            $imagePath = $_FILES['restaurant_images']['name'][$i];
-            $target_file = $target_dir . basename($imagePath);
-            if (move_uploaded_file($_FILES['restaurant_images']['tmp_name'][$i], $target_file)) {
-                $sql = "INSERT INTO restaurant_images (restaurant_id, image_path) VALUES (?, ?)";
-                $stmt = $conn->prepare($sql);
-                $stmt->bind_param("is", $restaurantId, $target_file);
-                $stmt->execute();
-            } else {
-                echo "Error uploading image: " . $_FILES['restaurant_images']['name'][$i];
-            }
-        }
-
-        header("Location: indexR.html");
-    } else {
-        echo "Error: " . $stmt->error;
+        $stmt = $conn->prepare("INSERT INTO restaurant_images (restaurant_id, image_path) VALUES (?, ?)");
+        $stmt->bind_param("is", $restaurant_id, $file_path);
+        $stmt->execute();
     }
-} else {
-    header("Location: indexR.html");
+
+    header('Location: myRestaurants.php');
 }
 ?>

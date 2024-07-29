@@ -6,7 +6,10 @@ $userId = $_SESSION['user_id'];
 
 $dateFilter = isset($_GET['date']) ? $_GET['date'] : '';
 
-$sql = "SELECT * FROM reservations WHERE restaurant_id IN (SELECT id FROM restaurants WHERE user_id = ?)";
+$sql = "SELECT reservations.*, restaurants.name AS restaurant_name 
+        FROM reservations 
+        JOIN restaurants ON reservations.restaurant_id = restaurants.id 
+        WHERE restaurants.user_id = ?";
 if (!empty($dateFilter)) {
     $sql .= " AND reservation_date = ?";
 }
@@ -99,15 +102,15 @@ if ($result->num_rows > 0) {
         <?php endif; ?>
         <?php foreach ($reservations as $reservation): ?>
         <div class="reservation-box">
-            <p><strong>Full Name:</strong> <?php echo $reservation['full_name']; ?></p>
-            <p><strong>Birthdate:</strong> <?php echo $reservation['birthdate']; ?></p>
-            <p><strong>Reservation Date:</strong> <?php echo $reservation['reservation_date']; ?></p>
-            <p><strong>Reservation Time:</strong> <?php echo $reservation['reservation_time']; ?></p>
-            <p><strong>Seating:</strong> <?php echo $reservation['seating']; ?></p>
-            <p><strong>Special Requests:</strong> <?php echo $reservation['special_requests']; ?></p>
-            <p><strong>Phone:</strong> <?php echo $reservation['phone']; ?></p>
-            <p><strong>Number of People:</strong> <?php echo $reservation['num_people']; ?></p>
-            <p><strong>Status:</strong> <?php echo $reservation['status']; ?></p>
+            <p><strong>Restaurant:</strong> <?php echo htmlspecialchars($reservation['restaurant_name']); ?></p>
+            <p><strong>Full Name:</strong> <?php echo htmlspecialchars($reservation['full_name']); ?></p>
+            <p><strong>Birthdate:</strong> <?php echo htmlspecialchars($reservation['birthdate']); ?></p>
+            <p><strong>Reservation Date:</strong> <?php echo htmlspecialchars($reservation['reservation_date']); ?></p>
+            <p><strong>Reservation Time:</strong> <?php echo htmlspecialchars($reservation['reservation_time']); ?></p>
+            <p><strong>Seating:</strong> <?php echo htmlspecialchars($reservation['seating']); ?></p>
+            <p><strong>Special Requests:</strong> <?php echo htmlspecialchars($reservation['special_requests']); ?></p>
+            <p><strong>Phone:</strong> <?php echo htmlspecialchars($reservation['phone']); ?></p>
+            <p><strong>Number of People:</strong> <?php echo htmlspecialchars($reservation['num_people']); ?></p>
         </div>
         <?php endforeach; ?>
     </div>

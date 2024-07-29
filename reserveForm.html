@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reservation Form</title>
     <link rel="stylesheet" href="stylesRf.css">
+    <style>
+        .full-capacity {
+            text-decoration: line-through;
+            color: red;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -24,7 +30,7 @@
             </div>
             <div class="form-group">
                 <label for="reservationTime">Reservation Time:</label>
-                <input type="time" id="reservationTime" name="reservationTime" required>
+                <select id="reservationTime" name="reservationTime" required></select>
             </div>
             <div class="form-group">
                 <label for="seating">Seating Preference:</label>
@@ -48,12 +54,48 @@
             <input type="hidden" name="restaurantId" id="restaurantId">
             <button type="submit">Submit Reservation</button>
         </form>
+        <div id="error-message" style="color: red;"></div>
     </div>
 
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const restaurantId = urlParams.get('restaurantId');
+        const reservationDate = urlParams.get('reservationDate');
+        const error = urlParams.get('error');
+
         document.getElementById('restaurantId').value = restaurantId;
+        if (reservationDate) {
+            document.getElementById('reservationDate').value = reservationDate;
+            fetchAvailableTimes(reservationDate);
+        }
+
+        if (error === 'full_capacity') {
+            document.getElementById('error-message').innerText = 'The selected time is fully booked. Please choose another time.';
+        }
+
+        document.getElementById('reservationDate').addEventListener('change', function() {
+            fetchAvailableTimes(this.value);
+        });
+
+        function fetchAvailableTimes(date) {
+            fetch(`getAvailableTimes.php?restaurantId=${restaurantId}&date=${date}`)
+                .then(response => response.json())
+                .then(data => {
+                    const timeSelect = document.getElementById('reservationTime');
+                    timeSelect.innerHTML = '';
+                    data.forEach(timeSlot => {
+                        const option = document.createElement('option');
+                        option.value = timeSlot.time;
+                        option.text = timeSlot.time;
+                        if (!timeSlot.available) {
+                            option.classList.add('full-capacity');
+                            option.disabled = true;
+                        }
+                        timeSelect.add(option);
+                    });
+                });
+        }
+        
     </script>
 </body>
 </html>
