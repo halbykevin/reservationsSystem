@@ -24,6 +24,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $deleteRatingsStmt->bind_param("i", $id);
         $deleteRatingsStmt->execute();
 
+        // Delete related records in reservations
+        $deleteReservationsSql = "DELETE FROM reservations WHERE restaurant_id = ?";
+        $deleteReservationsStmt = $conn->prepare($deleteReservationsSql);
+        $deleteReservationsStmt->bind_param("i", $id);
+        $deleteReservationsStmt->execute();
+
         // Delete the restaurant
         $sql = "DELETE FROM restaurants WHERE id = ?";
         $stmt = $conn->prepare($sql);
@@ -45,6 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
     }
 }
+
 
 
 $sql = "SELECT * FROM restaurants";

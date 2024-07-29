@@ -48,10 +48,11 @@ $sortOrder = isset($_GET['sort']) && $_GET['sort'] == 'rating' ? 'rating' : 'def
 // Fetch promotional restaurants
 $sql = "SELECT restaurants.*, IFNULL(AVG(ratings.rating), 0) AS avg_rating, COUNT(ratings.id) AS num_ratings
         FROM restaurants
-        LEFT JOIN ratings ON restaurants.id = ratings.restaurant_id";
+        LEFT JOIN ratings ON restaurants.id = ratings.restaurant_id
+        WHERE restaurants.is_promotional = 1";
 
 if ($selectedLocation !== 'All') {
-    $sql .= " WHERE restaurants.address = ?";
+    $sql .= " AND restaurants.address = ?";
 }
 
 $sql .= " GROUP BY restaurants.id";
@@ -69,12 +70,11 @@ if ($selectedLocation !== 'All') {
 $stmt->execute();
 $result = $stmt->get_result();
 
-
 if (!$result) {
     die("Database query failed: " . $conn->error);
 }
 
-$restaurants = [];
+$promotional_restaurants = [];
 if ($result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
         $restaurantId = $row['id'];
@@ -88,9 +88,10 @@ if ($result->num_rows > 0) {
             $images[] = $imageRow['image_path'];
         }
         $row['images'] = $images;
-        $restaurants[] = $row;
+        $promotional_restaurants[] = $row;
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -105,6 +106,7 @@ if ($result->num_rows > 0) {
     <link rel="stylesheet" href="gree-reco.css" />
     <link rel="stylesheet" href="he-bo-fo.css" />
     <link rel="stylesheet" href="main-buttons.css" />
+    <link rel="stylesheet" href="reco-restau.css" />
 </head>
 
 <body>
@@ -235,11 +237,11 @@ if ($result->num_rows > 0) {
 
 
 
-    <div id="recommendedContainer">
+<div id="recommendedContainer">
     <div class="recommended-container" id="recommendedSection">
         <h2>Recommended for you</h2>
         <div class="container">
-            <?php foreach ($restaurants as $restaurant): ?>
+            <?php foreach ($promotional_restaurants as $restaurant): ?>
             <div class="restaurant-box-landscape" data-name="<?php echo strtolower($restaurant['name']); ?>" onclick="openModal('restaurant<?php echo $restaurant['id']; ?>')">
                 <img src="<?php echo htmlspecialchars($restaurant['logo']); ?>" alt="<?php echo htmlspecialchars($restaurant['name']); ?>">
                 <div class="overlay">
@@ -309,12 +311,7 @@ if ($result->num_rows > 0) {
             <?php endforeach; ?>
         </div>
     </div>
-    <div id="searchResultsContainer" class="recommended-container" style="display: none;">
-    <div class="container">
-        <!-- Search results will be injected here dynamically -->
-    </div>
 </div>
-
 
     <script>
 

@@ -9,7 +9,7 @@
 }
 
 /*Header and body*/
-header{
+header {
   font-family: Arial, sans-serif;
   background-color: white;
   margin: 0;
@@ -23,4 +23,13 @@ body {
   background-color: white;
   margin: 0;
   padding: 0;
+}
+/* Media query for phones */
+@media screen and (max-width: 768px) {
+  .footer {
+    position: fixed; /* Fix the footer at the bottom */
+    bottom: 0;
+    left: 0;
+    width: 100vw; /* Ensure it spans the full viewport width */
+  }
 }
