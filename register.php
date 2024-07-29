@@ -1,32 +1,39 @@
 <?php
-$servername = "localhost";
-$username = "root";
-$password = "";
-$dbname = "restaurant_reservations";
+session_start();
+require 'db.php';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $name = $_POST['name'];
     $birthdate = $_POST['birthdate'];
     $phone = $_POST['phone'];
     $email = $_POST['email'];
-    $password = $_POST['password']; // Store password as plain text
-    $account_type = $_POST['account_type'];
-    
-    $sql = "INSERT INTO users (name, birthdate, phone, email, password, account_type) VALUES ('$name', '$birthdate', '$phone', '$email', '$password', '$account_type')";
-    
-    if ($conn->query($sql) === TRUE) {
-        header("Location: login.html");
+    $password = $_POST['password']; // Plain text password
+    $accountType = $_POST['account_type']; // assuming you have a field for account type in the form
+
+    // Check if email already exists
+    $checkEmailSql = "SELECT id FROM users WHERE email = ?";
+    $stmt = $conn->prepare($checkEmailSql);
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        // Email already exists
+        $_SESSION['error'] = 'This email is already registered.';
+        header("Location: register.html");
         exit();
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        // Email does not exist, proceed to insert
+        $sql = "INSERT INTO users (name, birthdate, phone, email, password, account_type) VALUES (?, ?, ?, ?, ?, ?)";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("ssssss", $name, $birthdate, $phone, $email, $password, $accountType);
+
+        if ($stmt->execute()) {
+            $_SESSION['success'] = 'Registration successful. You can now login.';
+            header("Location: login.php");
+        } else {
+            echo "Error: " . $stmt->error;
+        }
     }
 }
-
-$conn->close();
 ?>
