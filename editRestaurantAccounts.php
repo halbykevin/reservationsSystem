@@ -6,7 +6,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['delete'])) {
         $id = $_POST['id'];
 
-        // Delete related records in restaurant_images and ratings
+        // Delete related records in reservations, restaurant_images, and ratings
+        $deleteReservationsSql = "DELETE FROM reservations WHERE restaurant_id = ?";
+        $deleteReservationsStmt = $conn->prepare($deleteReservationsSql);
+        $deleteReservationsStmt->bind_param("i", $id);
+        $deleteReservationsStmt->execute();
+
         $deleteImagesSql = "DELETE FROM restaurant_images WHERE restaurant_id = ?";
         $deleteImagesStmt = $conn->prepare($deleteImagesSql);
         $deleteImagesStmt->bind_param("i", $id);
