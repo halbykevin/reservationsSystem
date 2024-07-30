@@ -3,6 +3,7 @@ session_start();
 require 'db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $userId = $_SESSION['user_id']; // Ensure this is set correctly
     $name = $_POST['name'];
     $bio = $_POST['bio'];
     $address = $_POST['address'];
@@ -12,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $open_hours = $_POST['open_hours'];
     $capacity = $_POST['capacity'];
     $category = $_POST['category'];
-    $user_id = $_SESSION['user_id'];
 
     // Handle file uploads for logo and images
     $logo = $_FILES['logo'];
@@ -23,8 +23,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     $stmt = $conn->prepare("INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, capacity, category, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issssssisis", $user_id, $name, $bio, $address, $phone, $location, $features, $open_hours, $capacity, $category, $logoPath);
-    $stmt->execute();
+    $stmt->bind_param("issssssisss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $capacity, $category, $logoPath);
+    if (!$stmt->execute()) {
+        echo "Error: " . $stmt->error;
+        exit;
+    }
     $restaurant_id = $stmt->insert_id;
 
     // Handle multiple images upload

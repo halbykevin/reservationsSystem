@@ -37,6 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->bind_param("iisssssssi", $userId, $restaurantId, $fullName, $birthdate, $reservationDate, $reservationTime, $seating, $specialRequests, $phone, $numPeople);
 
         if ($stmt->execute()) {
+            // Increment user's points after successful reservation
+            $sql = "UPDATE users SET points = points + 1 WHERE id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            
             header("Location: index.php?success=1");
         } else {
             echo "Error: " . $stmt->error;
