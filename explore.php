@@ -16,7 +16,6 @@ if ($notificationResult->num_rows > 0) {
     }
 }
 
-
 // Fetch categories from the categories table
 $categorySql = "SELECT * FROM categories";
 $categoryResult = $conn->query($categorySql);
@@ -47,9 +46,9 @@ if ($selectedLocation !== 'All') {
 }
 
 if ($selectedCategory !== '') {
-    $conditions[] = "restaurants.category = ?";
+    $conditions[] = "restaurants.category_id = ?";
     $params[] = $selectedCategory;
-    $types .= 's';
+    $types .= 'i'; // Change this to 'i' for integer
 }
 
 if (count($conditions) > 0) {
@@ -261,8 +260,8 @@ if ($result->num_rows > 0) {
 
 
 .category-box {
-    width: 100px; /* Smaller width */
-    height: 100px; /* Smaller height */
+    width: 130px; /* Smaller width */
+    height: 130px; /* Smaller height */
     flex: 0 0 auto; /* Prevents shrinking */
     position: relative;
     overflow: hidden;
@@ -481,7 +480,7 @@ window.onclick = function(event) {
 <div class="categories-container">
     <?php foreach ($categories as $category): ?>
         <div class="category-box">
-            <a href="explore.php?category=<?php echo urlencode($category['name']); ?>">
+            <a href="explore.php?category=<?php echo urlencode($category['id']); ?>"> <!-- Use category ID here -->
                 <img src="<?php echo htmlspecialchars($category['image_path']); ?>" alt="<?php echo htmlspecialchars($category['name']); ?>">
                 <!-- Remove the overlay div content -->
             </a>

@@ -29,7 +29,7 @@ while ($row = $result->fetch_assoc()) {
 </head>
 <body>
 <div class="button-container">
-        <button onclick="location.href='indexR.html'">Home</button>
+        <button onclick="location.href='indexR.php'">Home</button>
         <button onclick="location.href='viewReservations.php'">Reservations</button>
         <button onclick="location.href='reservationsHistory.php'">Reservations History</button>
         <button onclick="logout()">Logout</button>

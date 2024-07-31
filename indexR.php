@@ -1,3 +1,11 @@
+<?php
+require 'db.php';
+
+// Fetch categories from the database
+$categorySql = "SELECT id, name FROM categories";
+$categoryResult = $conn->query($categorySql);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,11 +62,9 @@
             <div class="form-group">
                 <label for="category">Category:</label>
                 <select id="category" name="category" required>
-                    <option value="Italien">Italien</option>
-                    <option value="Japanese">Japanese</option>
-                    <option value="International">International</option>
-                    <option value="Lebanese">Lebanese</option>
-                    <option value="Mexican">Mexican</option>
+                    <?php while($row = $categoryResult->fetch_assoc()): ?>
+                        <option value="<?php echo $row['id']; ?>"><?php echo $row['name']; ?></option>
+                    <?php endwhile; ?>
                 </select>
             </div>
             <div class="form-group">

@@ -22,8 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         move_uploaded_file($logo['tmp_name'], $logoPath);
     }
 
-    $stmt = $conn->prepare("INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, capacity, category, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("issssssisss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $capacity, $category, $logoPath);
+    $stmt = $conn->prepare("INSERT INTO restaurants (user_id, name, bio, address, phone, location, features, open_hours, capacity, category_id, logo) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+$stmt->bind_param("issssssisss", $userId, $name, $bio, $address, $phone, $location, $features, $open_hours, $capacity, $category, $logoPath);
+
     if (!$stmt->execute()) {
         echo "Error: " . $stmt->error;
         exit;

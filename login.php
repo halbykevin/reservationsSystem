@@ -3,7 +3,7 @@ session_start();
 $servername = "localhost";
 $username = "root";
 $password = "";
-$dbname = "restaurant_reservations";
+$dbname = "restaurant_reservations2";
 
 // Create connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -46,7 +46,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $_SESSION['user_name'] = $row['name'];
             $_SESSION['account_type'] = $row['account_type'];
             if ($row['account_type'] == 'restaurant') {
-                header("Location: indexR.html");
+                header("Location: indexR.php");
             } else {
                 header("Location: index.php");
             }
