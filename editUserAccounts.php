@@ -6,6 +6,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     if (isset($_POST['delete'])) {
         $id = $_POST['id'];
 
+        // Delete related records in ratings table
+        $sql = "DELETE FROM ratings WHERE user_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        // Now delete the user
         $sql = "DELETE FROM users WHERE id = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("i", $id);
@@ -24,6 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $stmt->execute();
     }
 }
+
 
 $sql = "SELECT * FROM users";
 $result = $conn->query($sql);
